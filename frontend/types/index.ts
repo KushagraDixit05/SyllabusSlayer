@@ -1,6 +1,14 @@
 /**
  * Type Definitions for Frontend
+ * Re-exports all type modules for convenient importing
  */
+
+// Phase 2 Type Modules
+export * from './partition';
+export * from './schedule';
+export * from './manual';
+export * from './export';
+export * from './speed';
 
 // API Response Types
 export interface ApiResponse<T = unknown> {
