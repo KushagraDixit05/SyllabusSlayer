@@ -12,11 +12,12 @@ import { Sparkles, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function PartitionControls() {
-  const { totalDuration, createPartitionsFromConfig, partitionConfig, updatePartitionConfig } = usePlannerStore();
+  const { totalDuration, partitions, createPartitionsFromConfig, partitionConfig, updatePartitionConfig } = usePlannerStore();
   const [sessionLength, setSessionLength] = useState(partitionConfig?.sessionLength || 60);
   const [breakDuration, setBreakDuration] = useState(partitionConfig?.breakDuration || 10);
   
-  const estimatedSessions = Math.ceil(totalDuration / sessionLength);
+  // Use actual partitions count instead of estimation
+  const estimatedSessions = partitions.length;
 
   useEffect(() => {
     // Auto-generate partitions when configuration changes
@@ -127,9 +128,9 @@ export function PartitionControls() {
             </div>
           </div>
           <div className="mt-3 text-sm text-gray-600">
-            Total study time: {Math.floor(totalDuration / 60)}h {totalDuration % 60}m
-            {breakDuration > 0 && (
-              <> + {Math.floor((estimatedSessions - 1) * breakDuration / 60)}h {(estimatedSessions - 1) * breakDuration % 60}m breaks</>
+            Total study time: {Math.floor(totalDuration / 3600)}h {Math.floor((totalDuration % 3600) / 60)}m
+            {breakDuration > 0 && estimatedSessions > 1 && (
+              <> + {Math.floor((estimatedSessions - 1) * breakDuration / 60)}h {((estimatedSessions - 1) * breakDuration) % 60}m breaks</>
             )}
           </div>
         </motion.div>

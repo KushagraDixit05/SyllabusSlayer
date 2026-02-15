@@ -30,15 +30,16 @@ export function ScheduleCalculator() {
   const [restDays, setRestDays] = useState<number[]>([]);
 
   useEffect(() => {
-    if (partitions.length > 0) {
+    if (totalDuration > 0) {
       calculateSchedule({
         startDate: new Date(startDate),
-        weekdayHours,
-        weekendHours,
-        restDays,
+        hoursPerWeekday: weekdayHours,
+        hoursPerWeekend: weekendHours,
+        restDaysPerWeek: restDays,
+        bufferPercentage: 15,
       });
     }
-  }, [weekdayHours, weekendHours, startDate, restDays, partitions]);
+  }, [weekdayHours, weekendHours, startDate, restDays, totalDuration, calculateSchedule]);
 
   const toggleRestDay = (dayId: number) => {
     setRestDays(prev =>
@@ -158,13 +159,13 @@ export function ScheduleCalculator() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Target Completion</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {format(schedule.completionDate, 'MMM dd, yyyy')}
+                    {format(schedule.endDate, 'MMM dd, yyyy')}
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Days Required</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {schedule.daysRequired}
+                    {schedule.totalDays}
                   </p>
                 </div>
                 <div className="text-center">
@@ -176,13 +177,11 @@ export function ScheduleCalculator() {
               </div>
 
               {/* Motivational Message */}
-              {schedule.motivationalMessage && (
-                <div className="rounded-lg bg-white/80 p-4 border border-blue-200">
-                  <p className="text-center text-gray-700 italic">
-                    "{schedule.motivationalMessage}"
-                  </p>
-                </div>
-              )}
+              <div className="rounded-lg bg-white/80 p-4 border border-blue-200">
+                <p className="text-center text-gray-700 italic">
+                  💪 Consistency is key to mastering this content!
+                </p>
+              </div>
 
               {/* Daily Breakdown */}
               {schedule.dailySchedule.length > 0 && (
@@ -201,9 +200,9 @@ export function ScheduleCalculator() {
                           <p className="text-sm font-medium">{format(day.date, 'EEE, MMM dd')}</p>
                         </div>
                         <div className="flex-1">
-                          {day.sessions.length > 0 ? (
+                          {day.hoursAllocated > 0 ? (
                             <p className="text-sm text-gray-600">
-                              {day.sessions.length} session{day.sessions.length > 1 ? 's' : ''} • {Math.floor(day.totalMinutes / 60)}h {day.totalMinutes % 60}m
+                              {day.hoursAllocated.toFixed(1)}h study time • {Math.floor(day.cumulativeMinutes / 60)}h {Math.floor(day.cumulativeMinutes % 60)}m total
                             </p>
                           ) : (
                             <p className="text-sm text-gray-400 italic">Rest day</p>

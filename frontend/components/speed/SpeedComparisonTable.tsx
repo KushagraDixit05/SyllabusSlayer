@@ -62,7 +62,7 @@ export function SpeedComparisonTable() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
-                          {formatDuration(comparison.adjustedDuration)}
+                          {formatDuration(comparison.totalDuration)}
                         </p>
                         {isActive && (
                           <Badge variant="default" className="text-xs">
@@ -81,10 +81,7 @@ export function SpeedComparisonTable() {
                   </div>
                   
                   <div className="hidden md:block text-right">
-                    <p className="text-sm text-gray-600">{comparison.percentageSaved.toFixed(0)}% faster</p>
-                    {comparison.funComparison && (
-                      <p className="text-xs text-gray-500 italic">{comparison.funComparison}</p>
-                    )}
+                    <p className="text-sm text-gray-600">{comparison.timeSavedPercentage.toFixed(0)}% faster</p>
                   </div>
                 </div>
               </motion.div>

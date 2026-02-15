@@ -4,6 +4,7 @@
  */
 
 import type { Video, Partition, PartitionConfig, PartitionSummary } from '@/types/partition';
+import { generateId } from './helpers';
 
 /**
  * Format duration in seconds to readable time string
@@ -54,7 +55,8 @@ export function createPartitions(
     return [];
   }
   
-  const targetSeconds = config.targetSessionLength * 60;
+  const targetSeconds = config.sessionLength * 60;
+  const breakDuration = config.breakDuration || 0;
   const partitions: Partition[] = [];
   let currentSession: Video[] = [];
   let currentDuration = 0;
@@ -77,7 +79,7 @@ export function createPartitions(
       
       // Prefer including video if overshoot is less than undershoot
       // Unless user prefers even sessions
-      const shouldInclude = !config.preferEvenSessions || overshoot < undershoot;
+      const shouldInclude = overshoot < undershoot;
       
       if (shouldInclude) {
         currentSession.push(video);
@@ -86,13 +88,16 @@ export function createPartitions(
       
       // Close current session
       partitions.push({
+        id: generateId(),
         sessionNumber,
         videos: [...currentSession],
+        duration: currentDuration,
         totalDuration: currentDuration,
         startVideoIndex,
         endVideoIndex: startVideoIndex + currentSession.length - 1,
         startTime: formatDuration(startTime),
         endTime: formatDuration(startTime + currentDuration),
+        breakAfter: breakDuration,
       });
       
       // Start new session
@@ -118,13 +123,16 @@ export function createPartitions(
   // Add final session if it has videos
   if (currentSession.length > 0) {
     partitions.push({
+      id: generateId(),
       sessionNumber,
       videos: currentSession,
+      duration: currentDuration,
       totalDuration: currentDuration,
       startVideoIndex,
       endVideoIndex: startVideoIndex + currentSession.length - 1,
       startTime: formatDuration(startTime),
       endTime: formatDuration(startTime + currentDuration),
+      breakAfter: 0, // No break after final session
     });
   }
   

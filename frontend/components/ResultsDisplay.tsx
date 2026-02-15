@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { PlaylistData } from '@/types';
-import { Clock, Video, BarChart3, Copy, Check } from 'lucide-react';
+import { Clock, Video, BarChart3, Copy, Check, ArrowRight } from 'lucide-react';
 import { copyToClipboard, cn } from '@/lib/utils';
 
 interface ResultsDisplayProps {
@@ -10,7 +11,31 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ data }: ResultsDisplayProps) {
+  const router = useRouter();
   const [copiedSpeed, setCopiedSpeed] = useState<string | null>(null);
+
+  const handleGoToPlanner = () => {
+    // Store playlist data in planner store
+    if (typeof window !== 'undefined') {
+      const { usePlannerStore } = require('@/store/usePlannerStore');
+      const store = usePlannerStore.getState();
+      
+      // Convert playlist data to videos
+      const videos = data.videos?.map((video: any) => ({
+        id: video.id || String(Math.random()),
+        title: video.title,
+        duration: video.duration,
+        source: 'youtube' as const,
+      })) || [];
+      
+      store.setPlaylistData(
+        data.title,
+        videos
+      );
+    }
+    
+    router.push('/planner');
+  };
 
   const handleCopy = async (speed: string, text: string) => {
     const success = await copyToClipboard(text);
@@ -43,6 +68,17 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
             value={data.averageVideoLengthFormatted}
           />
         </div>
+      </div>
+
+      {/* Action Button */}
+      <div className="flex justify-center py-4">
+        <button
+          onClick={handleGoToPlanner}
+          className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 font-semibold text-white shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+        >
+          Plan Your Study Sessions
+          <ArrowRight className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Speed Options */}

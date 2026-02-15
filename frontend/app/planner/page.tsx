@@ -14,13 +14,19 @@ import { motion } from 'framer-motion';
 
 export default function PlannerPage() {
   const [activeTab, setActiveTab] = useState<'partition' | 'schedule' | 'speed' | 'manual'>('partition');
+  const [showEmptyState, setShowEmptyState] = useState(true);
   const { videos, playlistTitle, totalDuration, partitions, schedule } = usePlannerStore();
   
   const hasVideos = videos.length > 0;
   const hasPartitions = partitions.length > 0;
   const hasSchedule = schedule !== null;
 
-  if (!hasVideos) {
+  const handleAddManually = () => {
+    setShowEmptyState(false);
+    setActiveTab('manual');
+  };
+
+  if (!hasVideos && showEmptyState) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container mx-auto px-4 py-12">
@@ -46,7 +52,7 @@ export default function PlannerPage() {
                   Analyze Playlist
                 </a>
                 <button
-                  onClick={() => setActiveTab('manual')}
+                  onClick={handleAddManually}
                   className="flex items-center gap-2 rounded-lg border-2 border-gray-300 px-6 py-3 font-medium text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all"
                 >
                   <Plus className="h-5 w-5" />

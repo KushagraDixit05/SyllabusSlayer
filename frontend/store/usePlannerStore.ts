@@ -9,13 +9,13 @@ import type {
   Video,
   Partition,
   PartitionConfig,
-  DEFAULT_PARTITION_CONFIG,
 } from '@/types/partition';
+import { DEFAULT_PARTITION_CONFIG } from '@/types/partition';
 import type {
   StudySchedule,
   ScheduleConfig,
-  DEFAULT_SCHEDULE_CONFIG,
 } from '@/types/schedule';
+import { DEFAULT_SCHEDULE_CONFIG } from '@/types/schedule';
 import type {
   ManualVideo,
   VideoTemplate,
@@ -51,17 +51,22 @@ interface PlannerState {
   
   // Speed
   selectedSpeed: number;
+  currentSpeed: number;
   
   // Actions - Video Management
   setVideos: (videos: Video[], title: string, duration: number) => void;
-  addManualVideo: (video: Omit<ManualVideo, 'id' | 'createdAt' | 'source'>) => void;
+  setPlaylistData: (title: string, videos: Video[]) => void;
+  addManualVideo: (title: string, durationInput: string | number) => void;
   updateManualVideo: (id: string, updates: Partial<ManualVideo>) => void;
   removeManualVideo: (id: string) => void;
+  removeVideo: (id: string) => void;
   bulkAddVideos: (videos: Omit<ManualVideo, 'id' | 'createdAt' | 'source'>[]) => void;
   clearVideos: () => void;
   
   // Actions - Partitioning
   setPartitionConfig: (config: Partial<PartitionConfig>) => void;
+  updatePartitionConfig: (config: Partial<PartitionConfig>) => void;
+  createPartitionsFromConfig: (config: PartitionConfig) => void;
   generatePartitions: () => void;
   clearPartitions: () => void;
   getPartitionSummary: () => ReturnType<typeof calculatePartitionSummary>;
@@ -69,7 +74,7 @@ interface PlannerState {
   
   // Actions - Scheduling
   setScheduleConfig: (config: Partial<ScheduleConfig>) => void;
-  calculateSchedule: () => void;
+  calculateSchedule: (config?: ScheduleConfig) => void;
   mapPartitionsToSchedule: () => void;
   clearSchedule: () => void;
   
@@ -81,6 +86,7 @@ interface PlannerState {
   
   // Actions - Speed
   setSpeed: (speed: number) => void;
+  setPlaybackSpeed: (speed: number) => void;
   
   // Actions - General
   reset: () => void;
@@ -99,6 +105,7 @@ export const usePlannerStore = create<PlannerState>()(
       schedule: null,
       manualVideos: [],
       templates: [],
+      currentSpeed: 1.0,
       selectedSpeed: 1.5,
       
       // Video Management
@@ -108,10 +115,29 @@ export const usePlannerStore = create<PlannerState>()(
         totalDuration: duration,
       }),
       
-      addManualVideo: (video) => {
+      setPlaylistData: (title, videos) => {
+        const totalDuration = videos.reduce((sum, v) => sum + v.duration, 0);
+        set({
+          videos,
+          playlistTitle: title,
+          totalDuration,
+        });
+      },
+      
+      addManualVideo: (title, durationInput) => {
+        // Parse duration if it's a string
+        let durationSeconds: number;
+        if (typeof durationInput === 'string') {
+          const { parseTimeInput } = require('@/lib/timeParser');
+          durationSeconds = parseTimeInput(durationInput);
+        } else {
+          durationSeconds = durationInput;
+        }
+        
         const newVideo: ManualVideo = {
-          ...video,
           id: generateId(),
+          title,
+          duration: durationSeconds,
           source: 'manual',
           createdAt: new Date(),
         };
@@ -141,6 +167,14 @@ export const usePlannerStore = create<PlannerState>()(
       },
       
       removeManualVideo: (id) => {
+        const manualVideos = get().manualVideos.filter(v => v.id !== id);
+        const videos = get().videos.filter(v => v.id !== id);
+        const totalDuration = videos.reduce((sum, v) => sum + v.duration, 0);
+        
+        set({ manualVideos, videos, totalDuration });
+      },
+      
+      removeVideo: (id) => {
         const manualVideos = get().manualVideos.filter(v => v.id !== id);
         const videos = get().videos.filter(v => v.id !== id);
         const totalDuration = videos.reduce((sum, v) => sum + v.duration, 0);
@@ -180,6 +214,20 @@ export const usePlannerStore = create<PlannerState>()(
         partitionConfig: { ...get().partitionConfig, ...config },
       }),
       
+      updatePartitionConfig: (config) => set({
+        partitionConfig: { ...get().partitionConfig, ...config },
+      }),
+      
+      createPartitionsFromConfig: (config) => {
+        const { videos } = get();
+        if (videos.length === 0) return;
+        
+        // Update config and generate partitions
+        set({ partitionConfig: config });
+        const partitions = createPartitions(videos, config);
+        set({ partitions });
+      },
+      
       generatePartitions: () => {
         const { videos, partitionConfig } = get();
         if (videos.length === 0) return;
@@ -198,7 +246,7 @@ export const usePlannerStore = create<PlannerState>()(
         const { totalDuration, partitionConfig } = get();
         return estimateSessionCount(
           totalDuration / 60,
-          partitionConfig.targetSessionLength
+          partitionConfig.sessionLength
         );
       },
       
@@ -207,13 +255,15 @@ export const usePlannerStore = create<PlannerState>()(
         scheduleConfig: { ...get().scheduleConfig, ...config },
       }),
       
-      calculateSchedule: () => {
-        const { totalDuration, scheduleConfig } = get();
-        if (totalDuration === 0) return;
+      calculateSchedule: (config) => {
+        const { totalDuration, partitions } = get();
+        const scheduleConfig = config || get().scheduleConfig;
+        
+        if (totalDuration === 0 && partitions.length === 0) return;
         
         try {
           const schedule = calculateCompletionDate(totalDuration / 60, scheduleConfig);
-          set({ schedule });
+          set({ schedule, scheduleConfig });
         } catch (error) {
           console.error('Failed to calculate schedule:', error);
         }
@@ -283,6 +333,11 @@ export const usePlannerStore = create<PlannerState>()(
       
       // Speed
       setSpeed: (speed) => set({ selectedSpeed: speed }),
+      
+      setPlaybackSpeed: (speed) => set({ 
+        selectedSpeed: speed,
+        currentSpeed: speed 
+      }),
       
       // General
       reset: () => set({
