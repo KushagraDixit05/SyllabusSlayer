@@ -17,8 +17,9 @@ This stack prioritizes:
 
 ## 🏗️ Core Framework
 
-### **Next.js 14+ (App Router)**
+### **Next.js 14.1+ (App Router)**
 **Why:** The React framework for production
+**Current Version:** `^14.1.0`
 
 **Key Features:**
 - **Server Components:** Optimize performance with zero-JS components where possible
@@ -36,8 +37,9 @@ This stack prioritizes:
 
 ## 🎨 Styling & UI Components
 
-### **Tailwind CSS 3+**
+### **Tailwind CSS 3.4+**
 **Why:** Utility-first CSS for rapid, consistent design
+**Current Version:** `^3.4.1`
 
 **Benefits:**
 - **Speed:** Build interfaces 3x faster than traditional CSS
@@ -48,6 +50,13 @@ This stack prioritizes:
 
 ### **Shadcn/UI**
 **Why:** Beautifully designed, accessible component library
+**Implementation Status:** ✅ **11 components integrated**
+
+**Integrated Components:**
+- `button.tsx`, `input.tsx`, `label.tsx`
+- `card.tsx`, `badge.tsx`, `checkbox.tsx`
+- `dialog.tsx`, `textarea.tsx`
+- `dropdown-menu.tsx`, `accordion.tsx`, `slider.tsx`
 
 **Not a Traditional Library:**
 - Components are *copied into your project* (full ownership)
@@ -63,6 +72,14 @@ This stack prioritizes:
 
 ### **Radix UI**
 **Why:** Unstyled, accessible component primitives
+**Current Packages:**
+- `@radix-ui/react-slot` `^1.2.3`
+- `@radix-ui/react-label` `^2.1.8`
+- `@radix-ui/react-accordion` `^1.1.2`
+- `@radix-ui/react-checkbox` `^1.0.4`
+- `@radix-ui/react-dialog` `^1.0.5`
+- `@radix-ui/react-dropdown-menu` `^2.0.6`
+- `@radix-ui/react-slider` `^1.1.2`
 
 **Where Shadcn Doesn't Cover:**
 - Complex interactions (Accordion, Slider, Switch)
@@ -75,6 +92,8 @@ This stack prioritizes:
 
 ### **Framer Motion**
 **Why:** Production-ready motion library for React
+**Current Version:** `^12.34.0`
+**Integration Status:** ✅ **Active in partition/schedule/speed components**
 
 **Use Cases:**
 - **Page Transitions:** Smooth navigation between routes
@@ -210,6 +229,17 @@ export async function fetchPlaylistData(playlistId: string) {
 
 ### **Zustand**
 **Why:** Minimal, flexible state management
+**Current Version:** `^4.5.7`
+**Implementation:** ✅ **Full store with persistence middleware**
+
+**Implementation Highlights:**
+- `usePlannerStore.ts`: Comprehensive Zustand store
+- LocalStorage persistence for user preferences
+- Video management (YouTube + manual entries)
+- Partition configuration and generation
+- Schedule calculation with caching
+- Template management for bulk entry
+- Playback speed tracking
 
 **When to Use:**
 - Global UI state (theme, sidebar open/closed)
@@ -241,6 +271,8 @@ export const usePlaylistStore = create((set) => ({
 
 ### **date-fns**
 **Why:** Modern, modular date library
+**Current Version:** `^2.30.0`
+**Usage:** Schedule calculations, completion date estimation
 
 **Use Cases:**
 - Calculate completion dates
@@ -254,10 +286,16 @@ export const usePlaylistStore = create((set) => ({
 
 ## 📄 PDF Generation
 
-### **jsPDF + html2canvas** (Phase 2)
+### **jsPDF + jspdf-autotable**
 **Why:** Client-side PDF creation
+**Current Versions:**
+- `jspdf`: `^4.1.0`
+- `jspdf-autotable`: `^5.0.7`
+**Implementation Status:** ✅ **PDF export functional**
 
 **Use Case:** Export study plans as shareable PDFs
+
+**Note:** jsPDF v4 is older version. Consider upgrading to v2.x in Phase 3 for better features.
 
 **Alternative:** **React-PDF**
 - Better for complex layouts
@@ -388,6 +426,70 @@ export const metadata = {
 - Hot module reloading
 - TypeScript support
 - Build for Chrome, Firefox, Edge from one codebase
+
+---
+
+## 🎨 UI Utilities & Helpers
+
+### **Lucide Icons**
+**Why:** Beautiful, consistent icon set
+**Current Version:** `^0.314.0`
+**Implementation Status:** ✅ **Used throughout UI**
+
+**Common Icons:**
+```javascript
+import { Clock, PlayCircle, TrendingUp, Sparkles, TrendingDown } from 'lucide-react'
+```
+
+### **class-variance-authority (CVA)**
+**Why:** Type-safe component variants
+**Current Version:** `^0.7.0`
+
+**Pattern:**
+```typescript
+const buttonVariants = cva("base-classes", {
+  variants: {
+    variant: {
+      default: "bg-primary",
+      outline: "border border-input",
+    },
+  },
+})
+```
+
+### **Tailwind Merge & clsx**
+**Current Versions:**
+- `tailwind-merge`: `^2.2.0`
+- `clsx`: `^2.1.0`
+
+**Use Case:** Conditional classes and preventing Tailwind class conflicts
+
+### **Sonner**
+**Why:** Beautiful toast notifications
+**Current Version:** `^1.3.1`
+**Implementation Status:** ✅ **Toast provider configured**
+
+**Features:**
+- Beautiful pre-styled toasts
+- Promise-based API
+- Success/error/loading states
+- Auto-dismiss with customizable duration
+
+**Usage:**
+```typescript
+import { toast } from 'sonner'
+
+toast.success('Plan exported successfully!')
+toast.error('Failed to fetch playlist')
+```
+
+### **@dnd-kit** (Phase 3)
+**Current Versions:**
+- `@dnd-kit/core`: `^6.3.1`
+- `@dnd-kit/sortable`: `^10.0.0`
+**Status:** 📦 **Installed, awaiting integration**
+
+**Planned Use:** Drag-and-drop video reordering in manual entry
 
 ---
 

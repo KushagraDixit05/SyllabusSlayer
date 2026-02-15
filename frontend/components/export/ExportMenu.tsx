@@ -34,12 +34,21 @@ export function ExportMenu() {
 
   const handlePDFExport = () => {
     try {
+      const totalDurationSeconds = videos.reduce((sum, v) => sum + v.duration, 0);
+      const hours = Math.floor(totalDurationSeconds / 3600);
+      const minutes = Math.floor((totalDurationSeconds % 3600) / 60);
+      const formattedDuration = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+      
       generateStudyPlanPDF({
-        title: playlistTitle || 'Study Plan',
-        videos,
+        playlistTitle: playlistTitle || 'Study Plan',
+        totalDuration: formattedDuration,
+        videoCount: videos.length,
+        speed: store.currentSpeed,
         partitions,
         schedule: schedule || undefined,
-        includeVideoList: true,
+        generatedDate: new Date(),
+        includeVideos: true,
+        videos,
       });
       toast.success('PDF exported successfully!');
     } catch (error) {

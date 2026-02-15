@@ -42,11 +42,19 @@ export function ScheduleCalculator() {
   }, [weekdayHours, weekendHours, startDate, restDays, totalDuration, calculateSchedule]);
 
   const toggleRestDay = (dayId: number) => {
-    setRestDays(prev =>
-      prev.includes(dayId)
-        ? prev.filter(d => d !== dayId)
-        : [...prev, dayId]
-    );
+    setRestDays(prev => {
+      if (prev.includes(dayId)) {
+        // Remove the day from rest days
+        return prev.filter(d => d !== dayId);
+      } else {
+        // Only add if we won't have all 7 days as rest days
+        if (prev.length >= 6) {
+          // Already have 6 rest days, can't add more
+          return prev;
+        }
+        return [...prev, dayId];
+      }
+    });
   };
 
   const totalHours = Math.floor(totalDuration / 3600);

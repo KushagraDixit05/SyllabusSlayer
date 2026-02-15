@@ -2,49 +2,112 @@
 
 Modern Next.js 14 application for YouTube playlist time architecture.
 
+**Current Version:** 2.0.0 (Phase 2 Complete)
+
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Icons**: Lucide React
+- **Framework**: Next.js 14.1+ (App Router)
+- **Language**: TypeScript 5.3+ (Strict Mode)
+- **Styling**: Tailwind CSS 3.4+
+- **UI Components**: Shadcn/UI + Radix UI
+- **State Management**: Zustand 4.5+ with persistence
+- **Animations**: Framer Motion 12.34+
+- **Icons**: Lucide React 0.314+
+- **Date Handling**: date-fns 2.30+
+- **PDF Export**: jsPDF 4.1+ with autotable
+- **Notifications**: Sonner 1.3+
 
 ## Features
 
-- ✅ Clean, modern UI with responsive design
+### Phase 1 (MVP) ✅
 - ✅ YouTube playlist URL and ID support
 - ✅ Real-time duration calculations
-- ✅ Multiple playback speed options
+- ✅ Multiple playback speed options (1.0x - 2.0x)
+- ✅ Clean, modern UI with responsive design
 - ✅ Copy-to-clipboard functionality
 - ✅ Loading and error states
-- ✅ Smooth animations and transitions
+
+### Phase 2 (Architect Engine) ✅
+- ✅ Intelligent session partitioning (15-300 min sessions)
+- ✅ Break duration configuration
+- ✅ Time-to-finish calculator with daily hours
+- ✅ Schedule breakdown (weekday/weekend hours, rest days)
+- ✅ Speed comparison table with time saved metrics
+- ✅ Manual video entry (single + bulk)
+- ✅ Flexible time format parsing (8+ formats)
+- ✅ PDF export for study plans
+- ✅ CSV export for partitions
+- ✅ Shareable links with base64 encoding
+- ✅ 11 Shadcn/UI components integrated
+- ✅ Smooth animations and micro-interactions
 
 ## Project Structure
 
 ```
 frontend/
 ├── app/
-│   ├── layout.tsx       # Root layout with metadata
-│   ├── page.tsx         # Main page
-│   └── globals.css      # Global styles
+│   ├── layout.tsx              # Root layout with metadata
+│   ├── page.tsx                # Home page (playlist analysis)
+│   ├── planner/
+│   │   └── page.tsx            # Main planner interface
+│   ├── shared/
+│   │   └── [id]/page.tsx       # Shared plan viewer
+│   └── globals.css             # Global styles
 ├── components/
-│   ├── PlaylistForm.tsx
-│   ├── ResultsDisplay.tsx
+│   ├── ui/                     # Shadcn/UI components (11 components)
+│   │   ├── button.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── card.tsx
+│   │   ├── badge.tsx
+│   │   ├── checkbox.tsx
+│   │   ├── dialog.tsx
+│   │   ├── textarea.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── accordion.tsx
+│   │   └── slider.tsx
+│   ├── partition/              # Partitioning components
+│   │   ├── PartitionControls.tsx
+│   │   └── PartitionList.tsx
+│   ├── schedule/               # Scheduling components
+│   │   └── ScheduleCalculator.tsx
+│   ├── speed/                  # Speed optimization components
+│   │   ├── SpeedSelector.tsx
+│   │   └── SpeedComparisonTable.tsx
+│   ├── manual/                 # Manual entry components
+│   │   └── ManualEntrySection.tsx
+│   ├── export/                 # Export components
+│   │   └── ExportMenu.tsx
+│   ├── PlaylistForm.tsx        # Phase 1 playlist input
+│   ├── ResultsDisplay.tsx      # Phase 1 results display
 │   ├── LoadingState.tsx
-│   └── ErrorMessage.tsx
-├── hooks/
-│   └── usePlaylist.ts   # Playlist data fetching hook
+│   ├── ErrorMessage.tsx
+│   └── ToastProvider.tsx       # Toast notifications
 ├── lib/
-│   ├── api.ts           # Backend API integration
-│   └── utils.ts         # Utility functions
+│   ├── api.ts                  # Backend API integration
+│   ├── utils.ts                # Utility functions
+│   ├── helpers.ts              # Helper utilities
+│   ├── partitioning.ts         # Partitioning algorithm
+│   ├── timeParser.ts           # Time format parsing
+│   ├── speed.ts                # Speed calculations
+│   ├── scheduling.ts           # Schedule calculator
+│   ├── pdfExport.ts            # PDF generation
+│   ├── csvExport.ts            # CSV export
+│   └── shareableLink.ts        # Link encoding/decoding
 ├── store/
-│   └── useUIStore.ts    # Global UI state
+│   ├── useUIStore.ts           # UI state
+│   └── usePlannerStore.ts      # Main planner state (Zustand)
 ├── types/
-│   └── index.ts         # TypeScript definitions
+│   ├── index.ts                # General types
+│   ├── partition.ts            # Partition types
+│   ├── schedule.ts             # Schedule types
+│   ├── manual.ts               # Manual entry types
+│   ├── export.ts               # Export types
+│   └── speed.ts                # Speed types
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
+├── components.json             # Shadcn/UI config
 └── next.config.js
 ```
 
@@ -93,37 +156,81 @@ The app will be available at `http://localhost:3000`.
 
 ## Component Architecture
 
-### PlaylistForm
+### Phase 1 Components
+
+#### PlaylistForm
 - Handles user input (URL or playlist ID)
 - Form validation and submission
 - Clear/reset functionality
 
-### ResultsDisplay
+#### ResultsDisplay
 - Displays playlist metadata (title, video count, avg length)
 - Shows duration at all playback speeds
 - Copy-to-clipboard for each speed option
+- Navigation to planner
 
-### LoadingState
+#### LoadingState
 - Loading spinner during API calls
 - User feedback during data fetching
 
-### ErrorMessage
+#### ErrorMessage
 - User-friendly error display
 - Consistent error UI
 
+### Phase 2 Components
+
+#### Partition System
+- **PartitionControls**: Session length configuration with presets and custom slider
+- **PartitionList**: Accordion view of study sessions with video breakdowns
+
+#### Schedule System
+- **ScheduleCalculator**: Daily hours input, rest days, completion date display
+
+#### Speed System
+- **SpeedSelector**: Preset speed buttons + custom slider (0.25x - 3.0x)
+- **SpeedComparisonTable**: Visual comparison with time savings
+
+#### Manual Entry
+- **ManualEntrySection**: Single + bulk video entry with flexible time parsing
+
+#### Export
+- **ExportMenu**: PDF/CSV export + shareable link generation
+- **ToastProvider**: Toast notifications for feedback
+
 ## State Management
 
-### Zustand Store (useUIStore)
+### Zustand Store (usePlannerStore)
+Comprehensive state management for:
+- **Videos**: YouTube playlist + manual entries
+- **Partitions**: Session configuration and generated partitions
+- **Schedule**: Daily hours, rest days, completion dates
+- **Speed**: Current playback speed selection
+- **Templates**: Saved video entry templates
+- **Persistence**: LocalStorage sync for user preferences
+
+**Key Methods:**
+```typescript
+// Video management
+setPlaylistData(title, videos)
+addManualVideo(title, duration)
+removeVideo(id)
+
+// Partitioning
+updatePartitionConfig(config)
+createPartitionsFromConfig(config)
+
+// Scheduling
+calculateSchedule(config?)
+
+// Speed
+setPlaybackSpeed(speed)
+```
+
+### UI Store (useUIStore)
 Global UI state for:
 - Loading states
 - Error messages
-- UI preferences (future: theme, settings)
-
-### Custom Hooks (usePlaylist)
-Encapsulates:
-- Playlist data fetching logic
-- Error handling
-- Loading state management
+- UI preferences (theme, settings)
 
 ## Styling Approach
 

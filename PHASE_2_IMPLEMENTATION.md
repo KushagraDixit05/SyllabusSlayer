@@ -422,4 +422,84 @@ This Phase 2 implementation demonstrates:
 
 ---
 
+## 🔧 Post-Implementation Bug Fixes (February 2026)
+
+During user testing, several critical issues were identified and resolved:
+
+### Issue #1: Missing UI Components
+**Problem**: TypeScript errors for 6 missing Shadcn/UI components
+- Missing: `button`, `input`, `label`, `card`, `badge`, `checkbox`
+**Solution**: Created all 11 Shadcn/UI components with proper Radix UI integration
+**Files Added**: 11 component files in `/components/ui/`
+
+### Issue #2: Type Import Errors
+**Problem**: `DEFAULT_PARTITION_CONFIG` imported as type instead of value
+**Solution**: Separated type imports from value imports in `usePlannerStore.ts`
+**Fix**: Changed `import type { DEFAULT_PARTITION_CONFIG }` to `import { DEFAULT_PARTITION_CONFIG }`
+
+### Issue #3: Property Name Mismatches
+**Problem**: Type definitions didn't match implementation
+- `targetSessionLength` vs `sessionLength`
+- `allowVideoBreaks` vs `respectVideoBreaks`
+**Solution**: Updated all type definitions and algorithm code to use consistent naming
+**Files Modified**: `partition.ts`, `partitioning.ts`, `PartitionControls.tsx`
+
+### Issue #4: Time Unit Confusion (Critical)
+**Problem**: Session count calculations were wildly incorrect
+- `totalDuration` stored in **seconds**
+- `sessionLength` stored in **minutes**
+- Formula was dividing seconds by minutes without conversion
+**Solution**: Fixed calculation to `Math.ceil(totalDuration / (sessionLength * 60))`
+**Impact**: Session estimates now accurate
+
+### Issue #5: Schedule Not Triggering
+**Problem**: Schedule calculator didn't recalculate on input changes
+**Root Cause**: 
+- Wrong dependency (`partitions` instead of `totalDuration`)
+- Wrong property names in config object
+**Solution**:
+- Changed useEffect dependency to `totalDuration`
+- Fixed config: `hoursPerWeekday`, `hoursPerWeekend`, `restDaysPerWeek`
+- Fixed display: `schedule.endDate`, `schedule.totalDays`
+
+### Issue #6: Navigation Flow Issues
+**Problem**: "Add Manually" button didn't work, no auto-redirect after analysis
+**Solution**:
+- Added `handleAddManually()` function in planner page
+- Added `showEmptyState` state management
+- Implemented auto-redirect from home to `/planner` after playlist analysis
+- Added `setPlaylistData()` method to store for data transfer
+
+### Issue #7: Speed Comparison Tab Crash
+**Problem**: `Cannot read properties of undefined (reading 'toFixed')`
+**Root Cause**: Property name mismatches in component
+- Type defined `timeSavedPercentage` and `totalDuration`
+- Component used `percentageSaved` and `adjustedDuration`
+**Solution**: Updated component to use correct property names
+**Files Fixed**: `SpeedComparisonTable.tsx`
+
+### Issue #8: Partition Session Count Off-by-One
+**Problem**: Estimated sessions showed +1 more than actually needed
+**Root Cause**: Using calculated estimate instead of actual partition count
+**Solution**: Changed from calculation to `partitions.length`
+**Fix**: `const estimatedSessions = partitions.length;`
+
+### Testing Results
+✅ All calculations now accurate (seconds ↔ minutes conversion correct)
+✅ Navigation flow works seamlessly (home → analyze → planner)
+✅ Manual entry functional with string/number input support
+✅ Speed tab displays without errors
+✅ Partition session count matches actual sessions generated
+✅ Schedule triggers immediately on any configuration change
+✅ All TypeScript errors resolved
+
+### Code Quality Improvements
+- Added proper import separation (type vs value)
+- Consistent property naming across codebase
+- Fixed time unit handling throughout application
+- Improved error handling and edge cases
+- Better state management with proper method signatures
+
+---
+
 *Built with ❤️ using Next.js 14, TypeScript, Tailwind CSS, Framer Motion, and Shadcn/UI*
