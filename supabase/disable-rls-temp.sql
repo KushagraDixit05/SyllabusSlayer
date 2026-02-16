@@ -1,0 +1,12 @@
+-- Temporary: Disable RLS to test authentication flow
+-- We'll re-enable with proper policies once NextAuth integration is working
+
+ALTER TABLE user_profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE playlists DISABLE ROW LEVEL SECURITY;
+ALTER TABLE videos DISABLE ROW LEVEL SECURITY;
+ALTER TABLE partitions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE schedules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_schedules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE achievements DISABLE ROW LEVEL SECURITY;
+ALTER TABLE activity_log DISABLE ROW LEVEL SECURITY;
+ALTER TABLE templates DISABLE ROW LEVEL SECURITY;
