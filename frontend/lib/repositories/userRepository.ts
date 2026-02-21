@@ -74,6 +74,20 @@ export class UserRepository {
   ): Promise<void> {
     await this.updateProfile(userId, { theme_preference: theme })
   }
+
+  async optInToLeaderboard(userId: string, username: string): Promise<void> {
+    await this.updateProfile(userId, {
+      leaderboard_opt_in: true,
+      leaderboard_username: username,
+    })
+  }
+
+  async optOutOfLeaderboard(userId: string): Promise<void> {
+    await this.updateProfile(userId, {
+      leaderboard_opt_in: false,
+      leaderboard_username: null,
+    })
+  }
 }
 
 export const userRepository = new UserRepository()

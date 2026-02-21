@@ -22,6 +22,8 @@ export interface Database {
           current_streak: number
           longest_streak: number
           last_activity_date: string | null
+          leaderboard_opt_in: boolean
+          leaderboard_username: string | null
           created_at: string
           updated_at: string
         }
@@ -42,6 +44,8 @@ export interface Database {
           current_streak?: number
           longest_streak?: number
           last_activity_date?: string | null
+          leaderboard_opt_in?: boolean
+          leaderboard_username?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -62,6 +66,8 @@ export interface Database {
           current_streak?: number
           longest_streak?: number
           last_activity_date?: string | null
+          leaderboard_opt_in?: boolean
+          leaderboard_username?: string | null
           created_at?: string
           updated_at?: string
         }

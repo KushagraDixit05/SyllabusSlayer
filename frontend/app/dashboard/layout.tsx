@@ -2,6 +2,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { CommandMenu } from '@/components/dashboard/CommandMenu'
+import { GlobalAchievementNotifier } from '@/components/achievements/GlobalAchievementNotifier'
 
 export default function DashboardLayout({
   children,
@@ -19,6 +20,7 @@ export default function DashboardLayout({
           </main>
         </div>
         <CommandMenu />
+        <GlobalAchievementNotifier />
       </div>
     </ProtectedRoute>
   )

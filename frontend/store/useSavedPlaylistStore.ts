@@ -6,6 +6,8 @@
 import { create } from 'zustand'
 import { playlistRepository } from '@/lib/repositories/playlistRepository'
 import { userRepository } from '@/lib/repositories/userRepository'
+import { achievementChecker } from '@/lib/achievements/checker'
+import type { AchievementDefinition } from '@/lib/achievements/definitions'
 import type { Playlist, Video } from '@/types/database'
 
 interface SavedPlaylistState {
@@ -19,13 +21,17 @@ interface SavedPlaylistState {
   isSaving: boolean
   error: string | null
   
+  // Achievement notifications
+  pendingAchievements: AchievementDefinition[]
+  dismissAchievement: () => void
+  
   // Actions - Database operations
   loadUserPlaylists: (userId: string) => Promise<void>
   loadPlaylist: (playlistId: string) => Promise<void>
   saveCurrentPlaylist: (userId: string, playlistData: Omit<Playlist, 'id' | 'user_id' | 'created_at' | 'updated_at'>, videos: Omit<Video, 'id' | 'playlist_id' | 'created_at'>[]) => Promise<Playlist | null>
   deletePlaylist: (playlistId: string) => Promise<void>
   updatePlaylistProgress: (playlistId: string, percentage: number) => Promise<void>
-  markPlaylistComplete: (playlistId: string) => Promise<void>
+  markPlaylistComplete: (playlistId: string, userId?: string) => Promise<void>
   
   // Actions - Local state
   setCurrentPlaylist: (playlist: Playlist | null) => void
@@ -41,6 +47,10 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
   isLoading: false,
   isSaving: false,
   error: null,
+  pendingAchievements: [],
+
+  dismissAchievement: () =>
+    set((state) => ({ pendingAchievements: state.pendingAchievements.slice(1) })),
 
   loadUserPlaylists: async (userId: string) => {
     set({ isLoading: true, error: null })
@@ -97,6 +107,14 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
         const hoursPlanned = Math.floor((playlistData.total_duration || 0) / 3600)
         await userRepository.incrementPlaylistStats(userId, hoursPlanned)
 
+        // Check for new achievements
+        const newAchievements = await achievementChecker.checkAfterPlaylistCreated(userId)
+        if (newAchievements.length > 0) {
+          set((state) => ({
+            pendingAchievements: [...state.pendingAchievements, ...newAchievements],
+          }))
+        }
+
         return result.playlist
       }
       
@@ -151,7 +169,7 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
     }
   },
 
-  markPlaylistComplete: async (playlistId: string) => {
+  markPlaylistComplete: async (playlistId: string, userId?: string) => {
     try {
       await playlistRepository.markAsCompleted(playlistId)
       set((state) => ({
@@ -161,6 +179,16 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
             : p
         ),
       }))
+      // Check for new achievements after completion
+      if (userId) {
+        await userRepository.incrementCompletedStats(userId, 0)
+        const newAchievements = await achievementChecker.checkAfterPlaylistCompleted(userId)
+        if (newAchievements.length > 0) {
+          set((state) => ({
+            pendingAchievements: [...state.pendingAchievements, ...newAchievements],
+          }))
+        }
+      }
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to mark complete' })
     }

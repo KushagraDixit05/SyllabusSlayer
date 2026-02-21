@@ -6,6 +6,7 @@ import { DashboardStats } from '@/components/dashboard/DashboardStats'
 import { ActivePlaylists } from '@/components/dashboard/ActivePlaylists'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { RecentActivity } from '@/components/dashboard/RecentActivity'
+import { ProgressOverview } from '@/components/dashboard/ProgressOverview'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -19,10 +20,13 @@ export default async function DashboardPage() {
     image: session!.user.image,
   })
   
-  const [playlists, userProfile] = await Promise.all([
+  const [playlists, userProfile, allPlaylists] = await Promise.all([
     playlistRepository.getActivePlaylistsByUserId(userId),
     userRepository.getProfile(userId),
+    playlistRepository.getByUserId(userId),
   ])
+
+  const completedPlaylists = allPlaylists.filter((p) => p.status === 'completed').length
 
   return (
     <div className="space-y-6">
@@ -42,6 +46,15 @@ export default async function DashboardPage() {
         <ActivePlaylists playlists={playlists} />
         <RecentActivity userId={userId} />
       </div>
+
+      <ProgressOverview
+        activePlaylists={playlists.length}
+        completedPlaylists={completedPlaylists}
+        totalPlaylists={allPlaylists.length}
+        currentStreak={userProfile?.current_streak ?? 0}
+        longestStreak={userProfile?.longest_streak ?? 0}
+        activityData={[]}
+      />
     </div>
   )
 }
