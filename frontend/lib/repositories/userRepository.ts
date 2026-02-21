@@ -67,6 +67,13 @@ export class UserRepository {
       total_hours_completed: (profile.total_hours_completed || 0) + hoursCompleted,
     })
   }
+
+  async updateThemePreference(
+    userId: string,
+    theme: 'light' | 'dark' | 'system'
+  ): Promise<void> {
+    await this.updateProfile(userId, { theme_preference: theme })
+  }
 }
 
 export const userRepository = new UserRepository()

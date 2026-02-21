@@ -6,6 +6,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { usePlaylist } from '@/hooks/usePlaylist';
 import { useUIStore } from '@/store/useUIStore';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Clock, Youtube, Zap } from 'lucide-react';
 
 export default function Home() {
@@ -15,18 +16,21 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
-              <Youtube className="h-6 w-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
+                <Youtube className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Syllabus Slayer
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">YouTube Time Architect</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Syllabus Slayer
-              </h1>
-              <p className="text-sm text-gray-600">YouTube Time Architect</p>
-            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>

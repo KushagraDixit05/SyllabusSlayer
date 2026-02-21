@@ -1,48 +1,85 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { 
-  LayoutDashboard, 
-  PlaySquare, 
-  Calendar, 
-  Trophy, 
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  LayoutDashboard,
+  ListVideo,
+  Trophy,
+  TrendingUp,
   Settings,
-  Zap,
-  BookOpen,
-  BarChart3
+  HelpCircle,
+  ChevronLeft,
+  Plus,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Playlists', href: '/dashboard/playlists', icon: PlaySquare },
-  { name: 'Planner', href: '/planner', icon: Calendar },
+  { name: 'Playlists', href: '/dashboard/playlists', icon: ListVideo },
   { name: 'Achievements', href: '/dashboard/achievements', icon: Trophy },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-]
-
-const quickLinks = [
-  { name: 'Templates', href: '/dashboard/templates', icon: BookOpen },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Help', href: '/dashboard/help', icon: HelpCircle },
 ]
 
 export function DashboardSidebar() {
+  const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:flex-col w-64 border-r bg-background">
-      <div className="p-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
-            <Zap className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl font-bold">Syllabus Slayer</span>
-        </Link>
+    <motion.aside
+      initial={false}
+      animate={{ width: collapsed ? 80 : 256 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="relative flex flex-col border-r bg-sidebar text-sidebar-foreground"
+    >
+      {/* Logo */}
+      <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-accent">
+        {!collapsed && (
+          <Link href="/dashboard" className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-lg">SS</span>
+            </div>
+            <span className="font-bold text-lg">Syllabus Slayer</span>
+          </Link>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-sidebar-foreground hover:bg-sidebar-accent"
+        >
+          <ChevronLeft
+            className={cn(
+              'h-4 w-4 transition-transform',
+              collapsed && 'rotate-180'
+            )}
+          />
+        </Button>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        <div className="space-y-1">
+      {/* Quick Action */}
+      <div className="p-4">
+        <Button 
+          asChild
+          className="w-full justify-start" 
+          size={collapsed ? 'icon' : 'default'}
+        >
+          <Link href="/planner">
+            <Plus className="h-4 w-4" />
+            {!collapsed && <span className="ml-2">New Playlist</span>}
+          </Link>
+        </Button>
+      </div>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-2">
+        <nav className="space-y-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -50,56 +87,31 @@ export function DashboardSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'flex items-center rounded-lg px-3 py-2 text-sm transition-colors',
+                  'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                   isActive
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground',
+                  collapsed && 'justify-center'
                 )}
               >
-                <item.icon className="h-5 w-5" />
-                {item.name}
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                {!collapsed && <span className="ml-3">{item.name}</span>}
               </Link>
             )
           })}
-        </div>
+        </nav>
+      </ScrollArea>
 
-        <div className="pt-6">
-          <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Quick Links
-          </p>
-          <div className="space-y-1">
-            {quickLinks.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              )
-            })}
+      {/* Footer */}
+      {!collapsed && (
+        <div className="border-t border-sidebar-accent p-4">
+          <div className="text-xs text-sidebar-foreground/60">
+            <p>Made with ❤️ for learners</p>
+            <p className="mt-1">v1.0.0</p>
           </div>
         </div>
-      </nav>
-
-      <div className="p-4 border-t">
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4">
-          <p className="text-sm font-semibold mb-1">🎯 Pro Tip</p>
-          <p className="text-xs text-muted-foreground">
-            Use keyboard shortcuts to navigate faster. Press{' '}
-            <kbd className="px-1 py-0.5 text-xs bg-background border rounded">?</kbd>{' '}
-            for help.
-          </p>
-        </div>
-      </div>
-    </aside>
+      )}
+    </motion.aside>
   )
 }
