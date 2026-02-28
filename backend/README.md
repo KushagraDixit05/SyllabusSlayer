@@ -2,6 +2,8 @@
 
 Backend API service for YouTube playlist analysis and duration calculation.
 
+> The backend handles YouTube API integration only. Authentication, database, and user features live in the Next.js frontend (see [frontend/README.md](../frontend/README.md)).
+
 ## Tech Stack
 
 - **Runtime**: Node.js 18+

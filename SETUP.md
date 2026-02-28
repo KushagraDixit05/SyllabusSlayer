@@ -1,6 +1,6 @@
 # Setup Guide: Syllabus Slayer
 
-> **Complete development environment setup for Phase 1 MVP**
+> **Complete development environment setup — Phases 1 through 3D+**
 
 ## 📋 Prerequisites
 
@@ -10,6 +10,9 @@ Before you begin, ensure you have the following installed:
 - **npm** (version 9.0.0 or higher)
 - **Git** (for version control)
 - **Code Editor** (VS Code recommended)
+- **Supabase account** (free tier: https://supabase.com)
+- **Google Cloud Console** project (for YouTube API + OAuth)
+- **GitHub OAuth App** (optional, for GitHub sign-in)
 
 Check versions:
 ```bash
@@ -105,17 +108,61 @@ This command will:
    ```
 
 3. **Edit `.env.local` file:**
-   Open `frontend/.env.local` and verify the backend URL:
+   Open `frontend/.env.local` and configure all keys:
    
    ```env
    # Backend API URL
    NEXT_PUBLIC_API_URL=http://localhost:5000
+
+   # Supabase
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+   # NextAuth.js
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=generate-a-random-secret-here
+
+   # Google OAuth
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+   # GitHub OAuth
+   GITHUB_CLIENT_ID=your_github_client_id
+   GITHUB_CLIENT_SECRET=your_github_client_secret
+
+   # Resend (email — optional)
+   RESEND_API_KEY=your_resend_api_key
    ```
 
 4. **Return to root:**
    ```bash
    cd ..
    ```
+
+### Step 5: Supabase Database Setup
+
+1. Create a Supabase project at https://supabase.com
+2. Copy the **Project URL** and **anon key** into `.env.local`
+3. Run the schema migration in the Supabase SQL Editor:
+   ```sql
+   -- Copy and run contents of supabase/schema.sql
+   -- Then run supabase/migrations/phase3c-gamification.sql
+   ```
+4. (Optional) Run `supabase/disable-rls-temp.sql` during development
+
+### Step 6: OAuth Setup
+
+**Google OAuth:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com) → Credentials
+2. Create OAuth 2.0 Client ID (Web application)
+3. Add `http://localhost:3000/api/auth/callback/google` as Authorized redirect URI
+4. Copy Client ID and Secret to `.env.local`
+
+**GitHub OAuth:**
+1. Go to GitHub → Settings → Developer settings → OAuth Apps
+2. Create new app with callback URL: `http://localhost:3000/api/auth/callback/github`
+3. Copy Client ID and Secret to `.env.local`
 
 ## ▶️ Running the Application
 
@@ -332,13 +379,24 @@ npm install
 
 - [ ] Backend health check returns 200 OK
 - [ ] Frontend loads without errors
-- [ ] Can enter playlist URL
+- [ ] Can enter playlist URL on home page
 - [ ] Loading state appears during fetch
 - [ ] Results display correctly with all speeds
 - [ ] Copy to clipboard works
 - [ ] Clear button resets form
 - [ ] Error messages show for invalid URLs
 - [ ] Responsive design works on mobile
+- [ ] Sign in with Google/GitHub works
+- [ ] Dashboard loads after sign-in (`/dashboard`)
+- [ ] Onboarding tour auto-starts for new users
+- [ ] Playlists page shows saved playlists (`/dashboard/playlists`)
+- [ ] Search page filters playlists (`/dashboard/search`)
+- [ ] Analytics page shows insight cards (`/dashboard/analytics`)
+- [ ] Achievements page loads (`/dashboard/achievements`)
+- [ ] Settings & Help pages load
+- [ ] Planner has back-to-dashboard link
+- [ ] Cmd+K command palette opens
+- [ ] Dark mode toggle works
 
 ### Sample Playlists for Testing
 

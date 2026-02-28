@@ -13,8 +13,9 @@ import { SpeedComparisonTable } from '@/components/speed/SpeedComparisonTable';
 import { ExportMenu } from '@/components/export/ExportMenu';
 import { ManualEntrySection } from '@/components/manual/ManualEntrySection';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { Calendar, Zap, FileText, Plus, BookmarkPlus, Loader2 } from 'lucide-react';
+import { Calendar, Zap, FileText, Plus, BookmarkPlus, Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function PlannerPage() {
   const [activeTab, setActiveTab] = useState<'partition' | 'schedule' | 'speed' | 'manual'>('partition');
@@ -128,11 +129,20 @@ export default function PlannerPage() {
       <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{playlistTitle || 'Untitled Playlist'}</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {videos.length} videos • {Math.floor(totalDuration / 60)} minutes total
-              </p>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="Back to Dashboard"
+              >
+                <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{playlistTitle || 'Untitled Playlist'}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {videos.length} videos • {Math.floor(totalDuration / 60)} minutes total
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />

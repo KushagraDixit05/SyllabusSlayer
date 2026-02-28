@@ -1,6 +1,6 @@
 # Architecture Documentation: Syllabus Slayer
 
-> **Production-grade monorepo architecture for Phase 1 MVP**
+> **Production-grade monorepo architecture — Phases 1 through 3D complete (with post-3D polish)**
 
 ## 🎯 Architecture Philosophy
 
@@ -30,44 +30,45 @@
 ## 🏛️ System Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                    User Browser                       │
-│                                                       │
-│  ┌─────────────────────────────────────────────┐   │
-│  │         Frontend (Next.js 14)                │   │
-│  │  - React Components                          │   │
-│  │  - Zustand State Management                  │   │
-│  │  - Tailwind CSS Styling                      │   │
-│  │  - API Client Layer                          │   │
-│  └─────────────────┬───────────────────────────┘   │
-└────────────────────┼──────────────────────────────────┘
-                     │
-                     │ HTTP/REST
-                     │
-┌────────────────────▼──────────────────────────────────┐
-│             Backend (Node + Express)                   │
-│                                                        │
-│  ┌──────────────────────────────────────────────┐   │
-│  │  API Layer                                    │   │
-│  │  - Routes (URL mapping)                       │   │
-│  │  - Controllers (Request handling)             │   │
-│  │  - Middleware (Rate limit, CORS, errors)     │   │
-│  └──────────────────┬───────────────────────────┘   │
-│                     │                                 │
-│  ┌──────────────────▼───────────────────────────┐   │
-│  │  Business Logic Layer                         │   │
-│  │  - Services (YouTube integration)             │   │
-│  │  - Utils (Parsing, calculation)               │   │
-│  └──────────────────┬───────────────────────────┘   │
-└────────────────────┼──────────────────────────────────┘
-                     │
-                     │ HTTPS
-                     │
-┌────────────────────▼──────────────────────────────────┐
-│            YouTube Data API v3                         │
-│  - Playlist metadata                                   │
-│  - Video details and durations                         │
-└───────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                          User Browser                                 │
+│                                                                        │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                   Frontend (Next.js 14)                      │    │
+│  │                                                               │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐ │    │
+│  │  │  Auth Layer  │  │  UI/Dashboard│  │  Analytics/Email  │ │    │
+│  │  │  NextAuth.js │  │  Components  │  │  Onboarding       │ │    │
+│  │  └──────┬───────┘  └──────┬───────┘  └────────┬──────────┘ │    │
+│  │         │                 │                    │             │    │
+│  │  ┌──────▼─────────────────▼────────────────────▼──────────┐ │    │
+│  │  │         Zustand Store Layer (Planner, Playlists,        │ │    │
+│  │  │          Saved, View, UI, Onboarding)                   │ │    │
+│  │  └────────────────────────┬───────────────────────────────┘ │    │
+│  │                           │                                   │    │
+│  │  ┌────────────────────────▼───────────────────────────────┐ │    │
+│  │  │              Repository / Data Access Layer             │ │    │
+│  │  │  PlaylistRepository  UserRepository  AchievementRepo   │ │    │
+│  │  └────────────────────────────────────────────────────────┘ │    │
+│  └─────────────────────────────────┬───────────────────────────┘    │
+└────────────────────────────────────┼────────────────────────────────┘
+                                     │
+              ┌──────────────────────┼──────────────────────┐
+              │ HTTP/REST            │ Supabase SDK          │ Resend API
+              ▼                      ▼                       ▼
+┌─────────────────────┐  ┌────────────────────────┐  ┌────────────────┐
+│  Backend            │  │  Supabase (PostgreSQL)  │  │  Resend Email  │
+│  (Node + Express)   │  │  - user_profiles        │  │  - Achievement │
+│  - YouTube API      │  │  - playlists            │  │    emails      │
+│  - Duration calc    │  │  - achievements         │  │  - Weekly      │
+│  - Playlist parse   │  │  - activity_log         │  │    summaries   │
+└─────────────────────┘  │  - leaderboard view     │  └────────────────┘
+         │               └────────────────────────┘
+         ▼
+┌─────────────────────┐
+│  YouTube Data API   │
+│  v3                  │
+└─────────────────────┘
 ```
 
 ## 📂 Backend Architecture
@@ -173,12 +174,27 @@ Total: 9 units (0.09% of daily quota)
 
 ```
 app/
-├── layout.tsx (Root Layout)
-│   └── page.tsx (Main Page)
-│       ├── PlaylistForm
-│       ├── LoadingState (conditional)
-│       ├── ErrorMessage (conditional)
-│       └── ResultsDisplay (conditional)
+├── layout.tsx (Root Layout + Providers)
+│   ├── page.tsx (Home — playlist analyser)
+│   │   ├── PlaylistForm
+│   │   ├── LoadingState (conditional)
+│   │   ├── ErrorMessage (conditional)
+│   │   └── ResultsDisplay (conditional)
+│   │
+│   ├── auth/signin/page.tsx
+│   ├── auth/error/page.tsx
+│   │
+│   ├── dashboard/layout.tsx (Sidebar + Header + CommandMenu + OnboardingTour)
+│   │   ├── dashboard/page.tsx (Stats + ActivePlaylists + ProgressOverview)
+│   │   ├── dashboard/playlists/ (PlaylistsClient — filter, search, cards)
+│   │   ├── dashboard/search/ (SearchClient — full-text search)
+│   │   ├── dashboard/analytics/ (AnalyticsContent client wrapper)
+│   │   ├── dashboard/achievements/
+│   │   ├── dashboard/settings/
+│   │   └── dashboard/help/
+│   │
+│   ├── planner/page.tsx (back-to-dashboard nav)
+│   └── shared/[id]/page.tsx
 ```
 
 ### State Management Strategy
@@ -382,30 +398,119 @@ Query Parameters:
 ✅ **Simple mental model** - Hooks-based API
 ✅ **Sufficient for Phase 1** - No complex state requirements
 
+## 🆕 Phase 3 Architecture Additions
+
+### Phase 3A — Authentication & Database
+
+```
+NextAuth.js v5 (OAuth)
+    ↓
+Google / GitHub OAuth providers
+    ↓
+@auth/supabase-adapter
+    ↓
+Supabase PostgreSQL
+  - user_profiles (RLS-protected)
+  - playlists / videos / partitions / schedules
+  - achievements / activity_log / templates
+    ↓
+Repository Layer (type-safe CRUD)
+  PlaylistRepository | UserRepository | AchievementRepository
+```
+
+**Row-Level Security (RLS):** Every table enforces `user_id = auth.uid()` policies, ensuring strict data isolation.
+
+**Automated Triggers:** Profile auto-creation on signup; stat counters (`total_playlists_created`, `total_hours_planned`) updated via DB triggers.
+
+### Phase 3B — Premium UI & Dark Mode
+
+```
+next-themes ThemeProvider
+    ↓
+CSS custom properties (--background, --primary, etc.)
+    ↓
+Tailwind sidebar utilities (bg-sidebar, text-sidebar-foreground)
+    ↓
+Dark / Light / System toggle → persisted in user_profiles.theme_preference
+```
+
+Key additions:
+- `cmdk` — Cmd+K command palette
+- `framer-motion` — sidebar collapse, page transitions, counting numbers
+- `sonner` — toast notifications
+- `useViewStore` — persistent grid/list/compact view preferences
+
+### Phase 3C — Gamification & Progress
+
+```
+AchievementChecker (lib/achievements/checker.ts)
+    ↓
+Checks 12 achievement definitions against user stats
+    ↓
+pendingAchievements[] pushed into useSavedPlaylistStore
+    ↓
+GlobalAchievementNotifier polls store → triggers confetti modal
+```
+
+Leaderboard architecture:
+```
+Supabase materialized view (leaderboard_mv)
+    ↓
+LeaderboardRepository (opt-in, refresh)
+    ↓
+LeaderboardTable (tabbed: hours / streak / completion)
+```
+
+Progress components read directly from `user_profiles` via `UserRepository`.
+
+### Phase 3D — Analytics, Onboarding & Email
+
+```
+AnalyticsService (lib/analytics/service.ts)
+    ↓  queries: user_profiles + playlists + activity_log
+    ↓  computes: daily avg, productive day, speed distribution,
+    ↓            completion rate, streak history, monthly progress
+    ↓
+AnalyticsPage (server component)
+    ↓  fetches data, serialises to plain objects
+    ↓
+AnalyticsContent (client wrapper)
+    ↓  renders lucide icons + InsightCard + MonthlyProgressChart
+```
+
+> **Note:** The server → client split was required because lucide icon components
+> (functions) cannot be passed from Server Components to Client Components.
+> `AnalyticsContent.tsx` is a `'use client'` wrapper that owns the icons.
+
+Onboarding flow:
+```
+useOnboardingStore (zustand + persist)
+    ↓
+shepherd.js Tour (direct — replaces react-shepherd)
+    ↓
+5-step guided tour (auto-starts 1.5s after first login)
+    ↓
+completeOnboarding() → persisted to localStorage
+```
+
+Email system:
+```
+Resend SDK (lib/email/client.ts)
+    ↓
+@react-email templates (AchievementUnlocked, WeeklySummary)
+    ↓
+EmailService.sendAchievementUnlocked() | sendWeeklySummary() | sendStreakReminder()
+```
+
 ## 🔮 Future Architecture Evolution
 
-### Phase 2: Persistence Layer
-
-```
-Backend → PostgreSQL (Supabase)
-- Store playlist calculations
-- User preferences (no auth yet)
-```
-
-### Phase 3: Authentication & Real-time
-
-```
-Frontend → NextAuth.js
-Backend → Supabase Auth
-Real-time → WebSockets for progress sync
-```
-
-### Phase 4: Ecosystem
+### Phase 4: Ecosystem Expansion
 
 ```
 Browser Extension → Shared API client
-Mobile Apps → Same backend API
+Mobile Apps → Same backend API + Supabase Realtime
 Premium Features → Stripe integration
+AI Insights → OpenAI API for smart playlist categorisation
 ```
 
 ## 📝 Key Architectural Decisions
@@ -416,10 +521,15 @@ Premium Features → Stripe integration
 | **Backend Framework** | Express | Mature, well-documented, flexible |
 | **Frontend Framework** | Next.js 14 | Best-in-class React framework, great DX |
 | **Styling** | Tailwind CSS | Rapid development, consistent design |
-| **State Management** | Zustand | Minimal, sufficient for Phase 1 |
+| **State Management** | Zustand | Minimal boilerplate, hooks-based |
 | **Type System** | TypeScript | Catch errors early, better DX |
 | **Validation** | Zod | Type-safe runtime validation |
 | **Icons** | Lucide | Tree-shakeable, modern icons |
+| **Auth** | NextAuth.js v5 | Flexible OAuth, Supabase adapter |
+| **Database** | Supabase (PostgreSQL) | RLS, realtime, hosted |
+| **Email** | Resend + @react-email | Developer-friendly, React templates |
+| **Charts** | Recharts | Composable, SSR-safe |
+| **Onboarding** | shepherd.js (direct) | Avoids react-shepherd's bundled React conflicts with Next.js 14 |
 
 ## 🎓 Learning Resources
 
@@ -427,7 +537,10 @@ Premium Features → Stripe integration
 - **Next.js Docs:** https://nextjs.org/docs
 - **YouTube Data API:** https://developers.google.com/youtube/v3
 - **TypeScript Handbook:** https://www.typescriptlang.org/docs/
+- **Supabase Docs:** https://supabase.com/docs
+- **NextAuth.js Docs:** https://authjs.dev
+- **Resend Docs:** https://resend.com/docs
 
 ---
 
-**This architecture is designed to grow with the product while maintaining simplicity in Phase 1.**
+**This architecture is designed to grow with the product — Phases 1–3D (+ post-3D polish) complete, Phase 4 ready.**

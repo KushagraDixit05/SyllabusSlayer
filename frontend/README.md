@@ -2,20 +2,27 @@
 
 Modern Next.js 14 application for YouTube playlist time architecture.
 
-**Current Version:** 2.0.0 (Phase 2 Complete)
+**Current Version:** 3.0.0 (Phase 3D+ Complete)
 
 ## Tech Stack
 
 - **Framework**: Next.js 14.1+ (App Router)
 - **Language**: TypeScript 5.3+ (Strict Mode)
 - **Styling**: Tailwind CSS 3.4+
-- **UI Components**: Shadcn/UI + Radix UI
-- **State Management**: Zustand 4.5+ with persistence
+- **UI Components**: Shadcn/UI + Radix UI (22 components)
+- **State Management**: Zustand 4.5+ (5 stores with persistence)
 - **Animations**: Framer Motion 12.34+
 - **Icons**: Lucide React 0.314+
 - **Date Handling**: date-fns 2.30+
 - **PDF Export**: jsPDF 4.1+ with autotable
 - **Notifications**: Sonner 1.3+
+- **Auth**: NextAuth.js v5 (Google & GitHub OAuth)
+- **Database**: Supabase (PostgreSQL) with @supabase/supabase-js
+- **Charts**: Recharts
+- **Onboarding**: shepherd.js (direct integration)
+- **Command Palette**: cmdk
+- **Theme**: next-themes (dark/light/system)
+- **Email**: @react-email + Resend SDK
 
 ## Features
 
@@ -38,76 +45,249 @@ Modern Next.js 14 application for YouTube playlist time architecture.
 - ✅ PDF export for study plans
 - ✅ CSV export for partitions
 - ✅ Shareable links with base64 encoding
-- ✅ 11 Shadcn/UI components integrated
 - ✅ Smooth animations and micro-interactions
+
+### Phase 3A (Auth & Database) ✅
+- ✅ NextAuth.js v5 with Google & GitHub OAuth
+- ✅ Supabase PostgreSQL with Row-Level Security
+- ✅ Repository layer (Playlist, User, Achievement, Leaderboard)
+- ✅ Protected dashboard with sidebar navigation
+- ✅ Middleware-based route protection
+
+### Phase 3B (Premium UI) ✅
+- ✅ Dark mode with next-themes (system/light/dark)
+- ✅ Command palette (Cmd+K) via cmdk
+- ✅ Framer Motion page & sidebar transitions
+- ✅ Grid / list / compact view controls
+- ✅ Toast notifications (sonner)
+
+### Phase 3C (Gamification) ✅
+- ✅ 12 achievements with automated unlock detection
+- ✅ Leaderboard (materialized view, opt-in, tabbed)
+- ✅ Progress tracking (streaks, heatmap, circular progress)
+- ✅ Milestone celebrations with confetti
+
+### Phase 3D (Analytics, Onboarding & Email) ✅
+- ✅ Analytics dashboard (InsightCards + MonthlyProgressChart)
+- ✅ Guided onboarding tour (shepherd.js, 5 steps)
+- ✅ Email templates (@react-email/components + Resend)
+- ✅ Error boundary, settings, help pages
+
+### Post-3D Polish ✅
+- ✅ Playlist library page with filter tabs & search
+- ✅ Dashboard search page with full-text filtering
+- ✅ 8-item sidebar navigation
+- ✅ Analytics server→client split (AnalyticsContent wrapper)
+- ✅ Planner ↔ Dashboard navigation
 
 ## Project Structure
 
 ```
 frontend/
 ├── app/
-│   ├── layout.tsx              # Root layout with metadata
-│   ├── page.tsx                # Home page (playlist analysis)
-│   ├── planner/
-│   │   └── page.tsx            # Main planner interface
-│   ├── shared/
-│   │   └── [id]/page.tsx       # Shared plan viewer
-│   └── globals.css             # Global styles
+│   ├── layout.tsx                 # Root layout (Providers)
+│   ├── page.tsx                   # Home page (playlist analysis)
+│   ├── providers.tsx              # SessionProvider + ThemeProvider + Toaster
+│   ├── globals.css
+│   ├── api/auth/[...nextauth]/    # NextAuth API route
+│   ├── auth/
+│   │   ├── signin/page.tsx
+│   │   └── error/page.tsx
+│   ├── dashboard/
+│   │   ├── layout.tsx             # Sidebar + Header + CommandMenu + OnboardingTour
+│   │   ├── page.tsx               # Stats + ActivePlaylists + ProgressOverview
+│   │   ├── playlists/
+│   │   │   ├── page.tsx           # Server component
+│   │   │   └── PlaylistsClient.tsx # Filter tabs, search, playlist cards
+│   │   ├── search/
+│   │   │   ├── page.tsx           # Server component
+│   │   │   └── SearchClient.tsx   # Full-text search UI
+│   │   ├── analytics/page.tsx     # → AnalyticsContent client wrapper
+│   │   ├── achievements/page.tsx
+│   │   ├── settings/page.tsx
+│   │   └── help/page.tsx
+│   ├── planner/page.tsx           # Planner + back-to-dashboard nav
+│   └── shared/[id]/page.tsx       # Shared plan viewer
+│
 ├── components/
-│   ├── ui/                     # Shadcn/UI components (11 components)
-│   │   ├── button.tsx
-│   │   ├── input.tsx
-│   │   ├── label.tsx
-│   │   ├── card.tsx
+│   ├── ui/                        # Shadcn/UI components (22)
+│   │   ├── accordion.tsx
+│   │   ├── avatar.tsx
 │   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
 │   │   ├── checkbox.tsx
 │   │   ├── dialog.tsx
-│   │   ├── textarea.tsx
 │   │   ├── dropdown-menu.tsx
-│   │   ├── accordion.tsx
-│   │   └── slider.tsx
-│   ├── partition/              # Partitioning components
+│   │   ├── input.tsx
+│   │   ├── interactive-card.tsx
+│   │   ├── label.tsx
+│   │   ├── progress.tsx
+│   │   ├── scroll-area.tsx
+│   │   ├── select.tsx
+│   │   ├── separator.tsx
+│   │   ├── skeleton-variants.tsx
+│   │   ├── slider.tsx
+│   │   ├── switch.tsx
+│   │   ├── table.tsx
+│   │   ├── tabs.tsx
+│   │   ├── textarea.tsx
+│   │   └── tooltip.tsx
+│   │
+│   ├── achievements/              # Phase 3C
+│   │   ├── AchievementCard.tsx
+│   │   ├── AchievementUnlockedModal.tsx
+│   │   ├── AchievementsClientSection.tsx
+│   │   └── GlobalAchievementNotifier.tsx
+│   │
+│   ├── analytics/                 # Phase 3D
+│   │   ├── AnalyticsContent.tsx   # Client wrapper (owns icon refs)
+│   │   ├── InsightCard.tsx
+│   │   └── MonthlyProgressChart.tsx
+│   │
+│   ├── animations/
+│   │   ├── CountingNumber.tsx
+│   │   ├── PageTransition.tsx
+│   │   └── ProgressRing.tsx
+│   │
+│   ├── auth/
+│   │   ├── ProtectedRoute.tsx
+│   │   ├── SignInForm.tsx
+│   │   └── UserMenu.tsx
+│   │
+│   ├── celebrations/              # Phase 3C
+│   │   └── MilestoneCelebration.tsx
+│   │
+│   ├── dashboard/
+│   │   ├── ActivePlaylists.tsx
+│   │   ├── CommandMenu.tsx
+│   │   ├── DashboardHeader.tsx
+│   │   ├── DashboardSidebar.tsx   # 8 nav items
+│   │   ├── DashboardStats.tsx
+│   │   ├── ProgressOverview.tsx
+│   │   ├── QuickActions.tsx
+│   │   ├── RecentActivity.tsx
+│   │   ├── StatsCard.tsx
+│   │   └── ViewControls.tsx
+│   │
+│   ├── export/
+│   │   └── ExportMenu.tsx
+│   │
+│   ├── landing/
+│   │   ├── FeaturesSection.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── HowItWorks.tsx
+│   │   └── LandingFooter.tsx
+│   │
+│   ├── leaderboard/               # Phase 3C
+│   │   ├── LeaderboardTable.tsx
+│   │   └── OptInDialog.tsx
+│   │
+│   ├── manual/
+│   │   └── ManualEntrySection.tsx
+│   │
+│   ├── onboarding/                # Phase 3D
+│   │   ├── OnboardingTour.tsx     # shepherd.js guided tour (direct)
+│   │   └── FeatureTooltip.tsx
+│   │
+│   ├── partition/
 │   │   ├── PartitionControls.tsx
 │   │   └── PartitionList.tsx
-│   ├── schedule/               # Scheduling components
+│   │
+│   ├── progress/                  # Phase 3C
+│   │   ├── ActivityHeatmap.tsx
+│   │   ├── CircularProgress.tsx
+│   │   ├── SessionCheckIn.tsx
+│   │   └── StreakDisplay.tsx
+│   │
+│   ├── providers/
+│   │   ├── ThemeProvider.tsx
+│   │   └── ToastProvider.tsx
+│   │
+│   ├── schedule/
 │   │   └── ScheduleCalculator.tsx
-│   ├── speed/                  # Speed optimization components
+│   │
+│   ├── speed/
 │   │   ├── SpeedSelector.tsx
 │   │   └── SpeedComparisonTable.tsx
-│   ├── manual/                 # Manual entry components
-│   │   └── ManualEntrySection.tsx
-│   ├── export/                 # Export components
-│   │   └── ExportMenu.tsx
-│   ├── PlaylistForm.tsx        # Phase 1 playlist input
-│   ├── ResultsDisplay.tsx      # Phase 1 results display
-│   ├── LoadingState.tsx
+│   │
+│   ├── theme/
+│   │   └── ThemeToggle.tsx
+│   │
+│   ├── ErrorBoundary.tsx
 │   ├── ErrorMessage.tsx
-│   └── ToastProvider.tsx       # Toast notifications
+│   ├── LoadingState.tsx
+│   ├── PlaylistForm.tsx
+│   └── ResultsDisplay.tsx
+│
+├── emails/                        # @react-email templates
+│   ├── AchievementUnlocked.tsx
+│   └── WeeklySummary.tsx
+│
+├── hooks/
+│   ├── usePlaylist.ts
+│   ├── useUserTheme.ts
+│   └── useWindowSize.ts
+│
 ├── lib/
-│   ├── api.ts                  # Backend API integration
-│   ├── utils.ts                # Utility functions
-│   ├── helpers.ts              # Helper utilities
-│   ├── partitioning.ts         # Partitioning algorithm
-│   ├── timeParser.ts           # Time format parsing
-│   ├── speed.ts                # Speed calculations
-│   ├── scheduling.ts           # Schedule calculator
-│   ├── pdfExport.ts            # PDF generation
-│   ├── csvExport.ts            # CSV export
-│   └── shareableLink.ts        # Link encoding/decoding
+│   ├── api.ts                     # Backend API integration
+│   ├── auth.ts                    # NextAuth config
+│   ├── auth-helpers.ts
+│   ├── utils.ts
+│   ├── helpers.ts
+│   ├── partitioning.ts
+│   ├── timeParser.ts
+│   ├── speed.ts
+│   ├── scheduling.ts
+│   ├── pdfExport.ts
+│   ├── csvExport.ts
+│   ├── shareableLink.ts
+│   ├── achievements/
+│   │   ├── checker.ts
+│   │   └── definitions.ts
+│   ├── analytics/
+│   │   └── service.ts
+│   ├── email/
+│   │   ├── client.ts
+│   │   └── service.ts
+│   ├── milestones/
+│   │   └── checker.ts
+│   ├── onboarding/
+│   │   └── samplePlaylists.ts
+│   ├── repositories/
+│   │   ├── index.ts
+│   │   ├── playlistRepository.ts
+│   │   ├── userRepository.ts
+│   │   ├── achievementRepository.ts
+│   │   └── leaderboardRepository.ts
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   └── server.ts
+│   └── utils/
+│       └── performance.ts
+│
 ├── store/
-│   ├── useUIStore.ts           # UI state
-│   └── usePlannerStore.ts      # Main planner state (Zustand)
+│   ├── usePlannerStore.ts         # Main planner state
+│   ├── useSavedPlaylistStore.ts   # DB-synced playlists + achievements
+│   ├── useUIStore.ts              # Global UI state
+│   ├── useViewStore.ts            # View preferences (grid/list/compact)
+│   └── useOnboardingStore.ts      # Onboarding state
+│
 ├── types/
-│   ├── index.ts                # General types
-│   ├── partition.ts            # Partition types
-│   ├── schedule.ts             # Schedule types
-│   ├── manual.ts               # Manual entry types
-│   ├── export.ts               # Export types
-│   └── speed.ts                # Speed types
+│   ├── index.ts
+│   ├── database.ts
+│   ├── partition.ts
+│   ├── schedule.ts
+│   ├── manual.ts
+│   ├── export.ts
+│   ├── speed.ts
+│   └── next-auth.d.ts
+│
+├── middleware.ts                   # NextAuth route protection
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
-├── components.json             # Shadcn/UI config
+├── postcss.config.js
 └── next.config.js
 ```
 
@@ -199,8 +379,10 @@ The app will be available at `http://localhost:3000`.
 
 ## State Management
 
-### Zustand Store (usePlannerStore)
-Comprehensive state management for:
+### Zustand Stores (5 total)
+
+#### usePlannerStore
+Comprehensive state management for the planner:
 - **Videos**: YouTube playlist + manual entries
 - **Partitions**: Session configuration and generated partitions
 - **Schedule**: Daily hours, rest days, completion dates
@@ -208,29 +390,41 @@ Comprehensive state management for:
 - **Templates**: Saved video entry templates
 - **Persistence**: LocalStorage sync for user preferences
 
-**Key Methods:**
-```typescript
-// Video management
-setPlaylistData(title, videos)
-addManualVideo(title, duration)
-removeVideo(id)
+#### useSavedPlaylistStore
+DB-synced state for authenticated users:
+- Saved playlists from Supabase
+- Achievement detection on playlist save
+- Pending achievement queue for notification
 
-// Partitioning
-updatePartitionConfig(config)
-createPartitionsFromConfig(config)
-
-// Scheduling
-calculateSchedule(config?)
-
-// Speed
-setPlaybackSpeed(speed)
-```
-
-### UI Store (useUIStore)
-Global UI state for:
+#### useUIStore
+Global UI state:
 - Loading states
 - Error messages
-- UI preferences (theme, settings)
+- UI preferences
+
+#### useViewStore
+View preferences (persisted):
+- Grid / list / compact modes
+
+#### useOnboardingStore
+Onboarding tour state (persisted):
+- `hasCompletedOnboarding` flag
+- `completeOnboarding()` action
+
+## Dashboard Navigation
+
+The sidebar provides 8 navigation entries:
+
+| Route | Label | Description |
+|-------|-------|-------------|
+| `/dashboard` | Dashboard | Stats, active playlists, progress overview |
+| `/dashboard/playlists` | Playlists | Saved playlist library with filter tabs & search |
+| `/planner` | Planner | Main planner interface |
+| `/dashboard/search` | Search | Full-text search across playlists |
+| `/dashboard/achievements` | Achievements | 12 achievements grid |
+| `/dashboard/analytics` | Analytics | Insight cards + monthly chart |
+| `/dashboard/settings` | Settings | User preferences |
+| `/dashboard/help` | Help | Help center |
 
 ## Styling Approach
 
@@ -285,13 +479,23 @@ Global UI state for:
 - Efficient state updates
 - Memoization where needed (future)
 
-## Future Enhancements (Post-MVP)
+## Key Architectural Notes
 
-Phase 2 and beyond will add:
-- Partitioning system
-- Time-to-finish calculator
-- Export functionality
-- Manual entry mode
+### Server → Client Component Boundary
+The analytics page uses a **server → client split pattern**:
+- `analytics/page.tsx` (server) fetches data and serialises it
+- `AnalyticsContent.tsx` (client) renders with lucide icons
+
+This is required because lucide icon components are functions and cannot be passed from Server Components to Client Components in Next.js 14.
+
+### Onboarding Tour
+Uses **shepherd.js directly** (not react-shepherd) due to react-shepherd v7 bundling its own React copy, which conflicts with Next.js 14's React instance. The `OnboardingTour.tsx` component creates a `new Shepherd.Tour()` inside a `useEffect`.
+
+### Authentication Flow
+- `middleware.ts` protects `/dashboard/*` routes
+- NextAuth.js v5 with `@auth/supabase-adapter`
+- Google & GitHub OAuth providers
+- Session available via `auth()` (server) or `useSession()` (client)
 
 ## API Integration
 

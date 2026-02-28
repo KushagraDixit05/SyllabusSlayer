@@ -3,6 +3,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { CommandMenu } from '@/components/dashboard/CommandMenu'
 import { GlobalAchievementNotifier } from '@/components/achievements/GlobalAchievementNotifier'
+import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 
 export default function DashboardLayout({
   children,
@@ -21,6 +22,7 @@ export default function DashboardLayout({
         </div>
         <CommandMenu />
         <GlobalAchievementNotifier />
+        <OnboardingTour />
       </div>
     </ProtectedRoute>
   )

@@ -1,16 +1,28 @@
-# Quick Start Guide - Phase 2 Planner
+# Quick Start Guide
 
 ## Running the Application
 
 ```bash
-cd frontend
-npm install  # Already done
+# From project root — starts both backend (port 5000) and frontend (port 3000)
 npm run dev
 ```
 
 Then visit:
-- Main app: http://localhost:3000
-- Planner: http://localhost:3000/planner
+- **Home page**: http://localhost:3000
+- **Dashboard**: http://localhost:3000/dashboard (requires sign-in)
+- **Planner**: http://localhost:3000/planner
+
+### Dashboard Routes (authenticated)
+
+| Route | Description |
+|-------|-------------|
+| `/dashboard` | Stats, active playlists, progress overview |
+| `/dashboard/playlists` | Saved playlist library (filter + search) |
+| `/dashboard/search` | Full-text search across your playlists |
+| `/dashboard/analytics` | Insight cards + monthly progress chart |
+| `/dashboard/achievements` | 12 achievement badges |
+| `/dashboard/settings` | User preferences |
+| `/dashboard/help` | Help center |
 
 ## Using the Planner
 
@@ -94,10 +106,10 @@ Testing Strategies | 1:15:30
 9. Copy and share the URL with anyone
 ```
 
-## Keyboard Shortcuts (Recommended for Future)
-- `Ctrl+K`: Quick command palette (not yet implemented)
+## Keyboard Shortcuts
+- `Cmd+K` / `Ctrl+K`: Command palette (quick navigation)
 - `Tab`: Navigate between inputs
-- `Enter`: Submit forms (works in manual entry)
+- `Enter`: Submit forms
 
 ## Troubleshooting
 
@@ -174,12 +186,11 @@ Mobile:
 
 ## Next Steps After Testing
 
-1. Integrate with Phase 1 home page
-2. Add error boundaries
-3. Implement template save/load UI
-4. Add drag-and-drop for video reordering
-5. Create automated tests
-6. Add analytics tracking
+1. Configure Supabase & OAuth keys (see SETUP.md)
+2. Run database migrations
+3. Sign in with Google or GitHub
+4. Complete the onboarding tour (auto-starts for new users)
+5. Save a playlist and watch achievements unlock
 
 ---
 

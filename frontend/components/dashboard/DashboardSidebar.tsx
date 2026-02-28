@@ -15,12 +15,16 @@ import {
   HelpCircle,
   ChevronLeft,
   Plus,
+  BookOpen,
+  Search,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Playlists', href: '/dashboard/playlists', icon: ListVideo },
+  { name: 'Planner', href: '/planner', icon: BookOpen },
+  { name: 'Search', href: '/dashboard/search', icon: Search },
   { name: 'Achievements', href: '/dashboard/achievements', icon: Trophy },
   { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
@@ -65,10 +69,11 @@ export function DashboardSidebar() {
 
       {/* Quick Action */}
       <div className="p-4">
-        <Button 
+        <Button
           asChild
-          className="w-full justify-start" 
+          className="w-full justify-start"
           size={collapsed ? 'icon' : 'default'}
+          data-tour="new-playlist"
         >
           <Link href="/planner">
             <Plus className="h-4 w-4" />
@@ -81,7 +86,7 @@ export function DashboardSidebar() {
       <ScrollArea className="flex-1 px-2">
         <nav className="space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
             return (
               <Link
                 key={item.name}

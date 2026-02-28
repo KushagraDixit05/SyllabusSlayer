@@ -4,7 +4,7 @@
 
 A premium time-planning system designed for the modern learner who treats knowledge acquisition as a strategic discipline. Not just another duration calculator—this is your personal learning operations command center.
 
-**Current Status:** Phase 2 Complete ✅ | Active Development | Next.js 14 + TypeScript
+**Current Status:** Phase 3D+ Complete ✅ | Active Development | Next.js 14 + TypeScript + Supabase
 
 ---
 
@@ -153,24 +153,56 @@ From browser extension for instant access to cloud sync for cross-device continu
 - Duration calculations with speed multipliers
 - Basic UI and responsive design
 
-**Phase 2 (Architect Engine):** ✅ Complete (February 2026)
+**Phase 2 (Architect Engine):** ✅ Complete
 - ✅ Intelligent partitioning system (custom session lengths)
 - ✅ Time-to-finish calculator (daily hours, completion dates)
 - ✅ Advanced speed features (comparison table, time saved metrics)
 - ✅ Manual entry with flexible time parsing
 - ✅ Export capabilities (PDF, CSV, shareable links)
-- ✅ 11 Shadcn/UI components integrated
 - ✅ Zustand state management with persistence
 - ✅ Framer Motion animations
 
-**Phase 3 (UI/UX & Gamification):** 📅 Planned (Next)
-- Premium dashboard redesign
-- Progress tracking system
-- Achievement badges and gamification
-- User authentication
-- Dark mode
+**Phase 3A (Auth & Database):** ✅ Complete
+- ✅ NextAuth.js v5 with Google & GitHub OAuth
+- ✅ Supabase (PostgreSQL) database with RLS
+- ✅ Repository layer (PlaylistRepository, UserRepository, AchievementRepository)
+- ✅ Protected dashboard with sidebar navigation
 
-See [ROADMAP.md](./ROADMAP.md) for detailed phase breakdown and [PHASE_2_IMPLEMENTATION.md](./PHASE_2_IMPLEMENTATION.md) for Phase 2 technical details.
+**Phase 3B (Premium UI):** ✅ Complete
+- ✅ Dark mode (next-themes, system/light/dark toggle)
+- ✅ Command palette (Cmd+K) via cmdk
+- ✅ Framer Motion page transitions & animations
+- ✅ Toast notifications (sonner)
+- ✅ Grid/list/compact view controls
+
+**Phase 3C (Gamification):** ✅ Complete
+- ✅ 12 achievements with unlock detection
+- ✅ Leaderboard (materialized view, opt-in)
+- ✅ Progress tracking (streaks, heatmap, circular progress)
+- ✅ Milestone celebrations with confetti
+
+**Phase 3D (Analytics, Onboarding & Email):** ✅ Complete
+- ✅ Analytics dashboard (InsightCards + MonthlyProgressChart)
+- ✅ Guided onboarding tour (shepherd.js, 5 steps)
+- ✅ Email templates (@react-email + Resend)
+- ✅ Error boundary, performance utilities
+- ✅ Settings & Help pages
+
+**Post-3D Polish:** ✅ Complete
+- ✅ Playlist library page (/dashboard/playlists) with filter tabs & search
+- ✅ Dashboard search page (/dashboard/search) with full-text filtering
+- ✅ 8-item sidebar navigation (Dashboard, Playlists, Planner, Search, Achievements, Analytics, Settings, Help)
+- ✅ Analytics server→client split (AnalyticsContent wrapper)
+- ✅ Planner ↔ Dashboard navigation
+- ✅ shepherd.js direct integration (replaced react-shepherd)
+
+**Phase 4 (Ecosystem):** 📅 Planned
+- Browser extension
+- Mobile apps
+- Premium features (Stripe)
+- AI-powered insights
+
+See [ROADMAP.md](./ROADMAP.md) for detailed phase breakdown and [PHASE3_COMPLETE.md](./PHASE3_COMPLETE.md) for Phase 3 technical details.
 
 ---
 
@@ -180,15 +212,30 @@ See [ROADMAP.md](./ROADMAP.md) for detailed phase breakdown and [PHASE_2_IMPLEME
 - Next.js 14.1+ (App Router)
 - TypeScript 5.3+ (Strict Mode)
 - Tailwind CSS 3.4+
-- Shadcn/UI + Radix UI
+- Shadcn/UI + Radix UI (22 components)
 - Framer Motion 12.34+
-- Zustand 4.5+ (State Management)
+- Zustand 4.5+ (5 stores)
+
+**Backend:**
+- Node.js + Express 4
+- TypeScript (Strict)
+- YouTube Data API v3
+- Zod validation
+
+**Database & Auth:**
+- Supabase (PostgreSQL) with Row-Level Security
+- NextAuth.js v5 (Google & GitHub OAuth)
+- @auth/supabase-adapter
 
 **Key Libraries:**
+- shepherd.js (Guided onboarding tour)
+- Recharts (Analytics charts)
+- cmdk (Command palette — Cmd+K)
 - date-fns (Date manipulation)
 - jsPDF + jspdf-autotable (PDF generation)
 - Lucide Icons (UI icons)
 - Sonner (Toast notifications)
+- Resend + @react-email (Email templates)
 
 See [TECH_STACK.md](./TECH_STACK.md) for comprehensive stack details.
 
@@ -211,7 +258,11 @@ cd backend
 cp .env.example .env
 # Add your YOUTUBE_API_KEY
 
-# Start development
+cd ../frontend
+cp .env.example .env.local
+# Add Supabase, NextAuth, OAuth, and Resend keys (see SETUP.md)
+
+# Start development (both frontend + backend)
 cd ..
 npm run dev
 ```
@@ -219,7 +270,7 @@ npm run dev
 Frontend: `http://localhost:3000`  
 Backend API: `http://localhost:5000`
 
-See [SETUP.md](./SETUP.md) for detailed installation instructions.
+See [SETUP.md](./SETUP.md) for detailed installation instructions including Supabase and OAuth setup.
 
 ---
 
@@ -227,9 +278,13 @@ See [SETUP.md](./SETUP.md) for detailed installation instructions.
 
 - **[ROADMAP.md](./ROADMAP.md)** - Development phases and timelines
 - **[TECH_STACK.md](./TECH_STACK.md)** - Complete technology choices
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Full system architecture (Phases 1–3D+)
+- **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)** - Complete file tree
 - **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** - Project structure and setup
 - **[PHASE_2_IMPLEMENTATION.md](./PHASE_2_IMPLEMENTATION.md)** - Phase 2 technical details
-- **[SETUP.md](./SETUP.md)** - Installation and configuration guide
+- **[PHASE3_COMPLETE.md](./PHASE3_COMPLETE.md)** - Phase 3 (A–D) summary
+- **[SETUP.md](./SETUP.md)** - Installation, Supabase, and OAuth guide
+- **[QUICK_START.md](./QUICK_START.md)** - Quick-start guide
 
 ---
 
