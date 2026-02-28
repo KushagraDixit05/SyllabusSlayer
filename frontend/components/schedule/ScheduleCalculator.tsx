@@ -5,11 +5,9 @@ import { usePlannerStore } from '@/store/usePlannerStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Clock, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 
 const DAYS_OF_WEEK = [
   { id: 1, label: 'Monday', short: 'Mon' },
@@ -22,7 +20,7 @@ const DAYS_OF_WEEK = [
 ];
 
 export function ScheduleCalculator() {
-  const { totalDuration, partitions, schedule, calculateSchedule } = usePlannerStore();
+  const { totalDuration, schedule, calculateSchedule } = usePlannerStore();
   
   const [weekdayHours, setWeekdayHours] = useState(2);
   const [weekendHours, setWeekendHours] = useState(4);

@@ -61,14 +61,14 @@ export function formatDurationText(seconds: number): string {
 /**
  * Calculate duration at different playback speeds
  */
-export function calculateSpeedDurations(totalSeconds: number) {
+export function calculateSpeedDurations(totalSeconds: number): import('../types').SpeedDurations {
   const speeds = [1, 1.25, 1.5, 1.75, 2] as const;
   
   return speeds.reduce((acc, speed) => {
     const adjustedSeconds = totalSeconds / speed;
-    acc[speed.toString() as keyof typeof acc] = formatDurationText(adjustedSeconds);
+    (acc as unknown as Record<string, string>)[speed.toString()] = formatDurationText(adjustedSeconds);
     return acc;
-  }, {} as Record<string, string>);
+  }, {} as import('../types').SpeedDurations);
 }
 
 /**

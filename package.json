@@ -27,5 +27,8 @@
     "react-shepherd": "^7.0.3",
     "recharts": "^3.7.0",
     "resend": "^6.9.2"
+  },
+  "overrides": {
+    "@auth/core": "0.41.0"
   }
 }

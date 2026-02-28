@@ -48,8 +48,8 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {/* Playlist Info */}
-      <div className="border-b pb-6">
-        <h3 className="mb-4 text-2xl font-bold text-gray-900">{data.title}</h3>
+      <div className="border-b border-gray-200 dark:border-neutral-700 pb-6">
+        <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{data.title}</h3>
         
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
@@ -83,7 +83,7 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
 
       {/* Speed Options */}
       <div>
-        <h4 className="mb-4 text-lg font-semibold text-gray-900">
+        <h4 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Playback Speed Options
         </h4>
         <div className="space-y-2">
@@ -104,11 +104,11 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
-      <div className="text-blue-600">{icon}</div>
+    <div className="flex items-center gap-3 rounded-lg bg-gray-50 dark:bg-neutral-800 p-4">
+      <div className="text-blue-600 dark:text-blue-400">{icon}</div>
       <div>
-        <p className="text-sm text-gray-600">{label}</p>
-        <p className="text-lg font-semibold text-gray-900">{value}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
+        <p className="text-lg font-semibold text-gray-900 dark:text-white">{value}</p>
       </div>
     </div>
   );
@@ -132,7 +132,7 @@ function SpeedRow({
     <div
       className={cn(
         "flex items-center justify-between rounded-lg border p-4 transition-all",
-        isNormalSpeed ? "border-gray-300 bg-white" : "border-blue-200 bg-blue-50/50"
+        isNormalSpeed ? "border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800" : "border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30"
       )}
     >
       <div className="flex items-center gap-3">
@@ -140,26 +140,26 @@ function SpeedRow({
           className={cn(
             "rounded-md px-3 py-1 text-sm font-semibold",
             isNormalSpeed
-              ? "bg-gray-200 text-gray-700"
+              ? "bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300"
               : "bg-blue-600 text-white"
           )}
         >
           {speedLabel}
         </span>
-        <span className="text-lg font-medium text-gray-900">{duration}</span>
+        <span className="text-lg font-medium text-gray-900 dark:text-gray-100">{duration}</span>
       </div>
       <button
         onClick={onCopy}
         className={cn(
           "rounded-md p-2 transition-all",
-          "hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          "hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         )}
         aria-label={`Copy ${speedLabel} duration`}
       >
         {isCopied ? (
           <Check className="h-5 w-5 text-green-600" />
         ) : (
-          <Copy className="h-5 w-5 text-gray-400" />
+          <Copy className="h-5 w-5 text-gray-400 dark:text-gray-500" />
         )}
       </button>
     </div>

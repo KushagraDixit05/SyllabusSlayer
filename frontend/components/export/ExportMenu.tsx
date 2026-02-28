@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { usePlannerStore } from '@/store/usePlannerStore';
 import { generateStudyPlanPDF } from '@/lib/pdfExport';
 import { generatePartitionCSV, generateScheduleCSV } from '@/lib/csvExport';
-import { encodePlaylistState, generateShareableURL } from '@/lib/shareableLink';
+import { generateShareableURL } from '@/lib/shareableLink';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,15 +98,14 @@ export function ExportMenu() {
 
   const handleShare = () => {
     try {
-      const encoded = encodePlaylistState({
+      const url = generateShareableURL({
         playlistTitle: playlistTitle || 'Untitled Playlist',
         videos,
         partitions,
         schedule: schedule || undefined,
         currentSpeed: store.currentSpeed,
+        timestamp: Date.now(),
       });
-      
-      const url = generateShareableURL(encoded);
       setShareUrl(url);
       setShareDialogOpen(true);
       toast.success('Shareable link generated!');

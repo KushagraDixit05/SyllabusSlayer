@@ -46,7 +46,7 @@ export function calculateCustomSpeed(
  */
 export function suggestOptimalSpeed(
   averageVideoDuration: number, // in seconds
-  videoCount: number,
+  _videoCount: number,
   totalDuration: number // in seconds
 ): SpeedRecommendation {
   const avgMinutes = averageVideoDuration / 60;

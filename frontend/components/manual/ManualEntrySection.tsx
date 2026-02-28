@@ -133,7 +133,7 @@ export function ManualEntrySection() {
           <CardContent>
             <div className="space-y-2">
               <AnimatePresence>
-                {videos.map((video, index) => (
+                {videos.map((video) => (
                   <motion.div
                     key={video.id}
                     initial={{ opacity: 0, y: -10 }}

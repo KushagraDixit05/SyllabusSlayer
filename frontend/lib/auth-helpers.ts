@@ -38,8 +38,8 @@ export async function syncUserToDatabase(user: {
       const { error } = await supabase
         .from('user_profiles')
         .update({
-          display_name: user.name || existingProfile.display_name,
-          avatar_url: user.image || existingProfile.avatar_url,
+          display_name: user.name || undefined,
+          avatar_url: user.image || undefined,
         })
         .eq('id', user.id)
 

@@ -88,7 +88,7 @@ class PlaylistController {
    * GET /api/health
    * Health check endpoint
    */
-  async healthCheck(req: Request, res: Response): Promise<void> {
+  async healthCheck(_req: Request, res: Response): Promise<void> {
     res.status(200).json({
       success: true,
       data: {

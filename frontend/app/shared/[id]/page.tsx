@@ -26,7 +26,7 @@ export default function SharedPlanPage() {
     if (id) {
       try {
         const decoded = decodePlaylistState(id);
-        setState(decoded);
+        setState(decoded as ShareableState);
       } catch (err) {
         setError('Invalid or corrupted share link');
         console.error(err);
@@ -126,31 +126,31 @@ export default function SharedPlanPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
                     <div className="text-center">
                       <p className="text-sm text-gray-600 mb-1">Target Completion</p>
                       <p className="text-xl font-bold text-gray-900">
-                        {format(new Date(state.schedule.completionDate), 'MMM dd, yyyy')}
+                        {format(new Date(state.schedule.endDate), 'MMM dd, yyyy')}
                       </p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-gray-600 mb-1">Days Required</p>
                       <p className="text-xl font-bold text-blue-600">
-                        {state.schedule.daysRequired}
+                        {state.schedule.totalDays}
                       </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Hours</p>
+                      <p className="text-sm text-gray-600 mb-1">Study Days</p>
                       <p className="text-xl font-bold text-purple-600">
-                        {state.schedule.totalHours}h
+                        {state.schedule.studyDays}
                       </p>
                     </div>
                   </div>
                   
-                  {state.schedule.motivationalMessage && (
+                  {state.schedule.studyDays > 0 && (
                     <div className="rounded-lg bg-white/80 p-3 border border-blue-200">
                       <p className="text-center text-gray-700 italic text-sm">
-                        "{state.schedule.motivationalMessage}"
+                        Study for {state.schedule.studyDays} days to complete!
                       </p>
                     </div>
                   )}

@@ -20,9 +20,9 @@ export class AppError extends Error {
  */
 export function errorHandler(
   err: Error | AppError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
   console.error('Error:', err);
   
@@ -61,7 +61,7 @@ export function errorHandler(
 /**
  * 404 Not Found Handler
  */
-export function notFoundHandler(req: Request, res: Response) {
+export function notFoundHandler(_req: Request, res: Response) {
   res.status(404).json({
     success: false,
     error: {

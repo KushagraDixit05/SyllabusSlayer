@@ -21,6 +21,10 @@ export interface PDFExportData {
 
 export interface ShareableState {
   videos: Video[];
+  playlistTitle?: string;
+  partitions?: Partition[];
+  schedule?: StudySchedule;
+  currentSpeed?: number;
   partitionConfig?: any;
   scheduleConfig?: any;
   speed?: number;

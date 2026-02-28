@@ -41,7 +41,7 @@ class YouTubeService {
       throw new AppError('Failed to fetch playlist details', 500, 'API_ERROR');
     }
     
-    const data: YouTubePlaylistDetailsResponse = await response.json();
+    const data = await response.json() as YouTubePlaylistDetailsResponse;
     
     if (!data.items || data.items.length === 0) {
       throw new AppError('Playlist not found or is private', 404, 'PLAYLIST_NOT_FOUND');
@@ -72,7 +72,7 @@ class YouTubeService {
         throw new AppError('Failed to fetch playlist items', 500, 'API_ERROR');
       }
       
-      const data: YouTubePlaylistResponse = await response.json();
+      const data = await response.json() as YouTubePlaylistResponse;
       
       if (!data.items || data.items.length === 0) {
         break;
@@ -108,7 +108,7 @@ class YouTubeService {
         throw new AppError('Failed to fetch video details', 500, 'API_ERROR');
       }
       
-      const data: YouTubeVideoDetailsResponse = await response.json();
+      const data = await response.json() as YouTubeVideoDetailsResponse;
       
       videos.push(
         ...data.items.map((item) => ({

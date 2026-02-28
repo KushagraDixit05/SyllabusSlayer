@@ -12,7 +12,7 @@ import { Sparkles, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function PartitionControls() {
-  const { totalDuration, partitions, createPartitionsFromConfig, partitionConfig, updatePartitionConfig } = usePlannerStore();
+  const { totalDuration, partitions, createPartitionsFromConfig, partitionConfig } = usePlannerStore();
   const [sessionLength, setSessionLength] = useState(partitionConfig?.sessionLength || 60);
   const [breakDuration, setBreakDuration] = useState(partitionConfig?.breakDuration || 10);
   

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { motion, useSpring, useTransform } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { useSpring, useTransform, useMotionValueEvent } from 'framer-motion'
 
 interface CountingNumberProps {
   value: number
@@ -20,15 +20,18 @@ export function CountingNumber({
   const display = useTransform(spring, (current) =>
     Math.round(current).toLocaleString()
   )
+  const [displayValue, setDisplayValue] = useState('0')
+
+  useMotionValueEvent(display, 'change', (latest) => setDisplayValue(latest))
 
   useEffect(() => {
     spring.set(value)
   }, [spring, value])
 
   return (
-    <motion.span className={className}>
-      {display}
+    <span className={className}>
+      {displayValue}
       {suffix}
-    </motion.span>
+    </span>
   )
 }

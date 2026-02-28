@@ -4,13 +4,18 @@
   "description": "Syllabus Slayer Backend - YouTube Data API Integration",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "dev": "node ../node_modules/tsx/dist/cli.mjs watch src/server.ts",
+    "build": "node ../node_modules/typescript/bin/tsc",
     "start": "node dist/server.js",
     "lint": "eslint src --ext .ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "node ../node_modules/typescript/bin/tsc --noEmit"
   },
-  "keywords": ["youtube", "api", "express", "typescript"],
+  "keywords": [
+    "youtube",
+    "api",
+    "express",
+    "typescript"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -30,7 +35,7 @@
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "eslint": "^8.56.0",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
