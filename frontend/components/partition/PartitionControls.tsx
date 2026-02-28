@@ -36,7 +36,7 @@ export function PartitionControls() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-purple-600" />
+          <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
           Partition Your Study Plan
         </CardTitle>
         <CardDescription>
@@ -75,7 +75,7 @@ export function PartitionControls() {
                 min={15}
                 max={300}
               />
-              <span className="text-sm text-gray-600">minutes</span>
+              <span className="text-sm text-muted-foreground">minutes</span>
             </div>
           </div>
           <Slider
@@ -101,7 +101,7 @@ export function PartitionControls() {
                 min={0}
                 max={60}
               />
-              <span className="text-sm text-gray-600">minutes</span>
+              <span className="text-sm text-muted-foreground">minutes</span>
             </div>
           </div>
           <Slider
@@ -118,16 +118,16 @@ export function PartitionControls() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4 border border-blue-200"
+          className="rounded-lg bg-muted p-4 border border-border"
         >
           <div className="flex items-center gap-3">
-            <Clock className="h-8 w-8 text-blue-600" />
+            <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             <div>
-              <p className="text-sm text-gray-600">Estimated Study Sessions</p>
-              <p className="text-2xl font-bold text-gray-900">{estimatedSessions}</p>
+              <p className="text-sm text-muted-foreground">Estimated Study Sessions</p>
+              <p className="text-2xl font-bold text-foreground">{estimatedSessions}</p>
             </div>
           </div>
-          <div className="mt-3 text-sm text-gray-600">
+          <div className="mt-3 text-sm text-muted-foreground">
             Total study time: {Math.floor(totalDuration / 3600)}h {Math.floor((totalDuration % 3600) / 60)}m
             {breakDuration > 0 && estimatedSessions > 1 && (
               <> + {Math.floor((estimatedSessions - 1) * breakDuration / 60)}h {((estimatedSessions - 1) * breakDuration) % 60}m breaks</>

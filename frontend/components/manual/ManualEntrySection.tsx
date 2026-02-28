@@ -53,7 +53,7 @@ export function ManualEntrySection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-green-600" />
+            <Plus className="h-5 w-5 text-green-600 dark:text-green-400" />
             Add Single Video
           </CardTitle>
           <CardDescription>
@@ -94,7 +94,7 @@ export function ManualEntrySection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-blue-600" />
+            <Upload className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Bulk Entry
           </CardTitle>
           <CardDescription>
@@ -112,8 +112,8 @@ export function ManualEntrySection() {
               rows={8}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-gray-500">
-              Format: <code className="bg-gray-100 px-1 py-0.5 rounded">Title | Duration</code>
+            <p className="text-xs text-muted-foreground">
+              Format: <code className="bg-muted px-1 py-0.5 rounded">Title | Duration</code>
               {' '}(supports: HH:MM:SS, "15 minutes", "1h 30m", etc.)
             </p>
           </div>
@@ -140,12 +140,12 @@ export function ManualEntrySection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ duration: 0.2 }}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-gray-300 bg-white group"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-border/80 bg-card group"
                   >
-                    <GripVertical className="h-5 w-5 text-gray-400" />
+                    <GripVertical className="h-5 w-5 text-muted-foreground" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{video.title}</p>
-                      <p className="text-xs text-gray-600">{formatDuration(video.duration)}</p>
+                      <p className="text-xs text-muted-foreground">{formatDuration(video.duration)}</p>
                     </div>
                     <Button
                       variant="ghost"
@@ -153,7 +153,7 @@ export function ManualEntrySection() {
                       onClick={() => removeVideo(video.id)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <Trash2 className="h-4 w-4 text-red-600" />
+                      <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                     </Button>
                   </motion.div>
                 ))}

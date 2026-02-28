@@ -64,7 +64,7 @@ export function ScheduleCalculator() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Schedule Calculator
           </CardTitle>
           <CardDescription>
@@ -99,7 +99,7 @@ export function ScheduleCalculator() {
                   step={0.5}
                   className="w-24"
                 />
-                <span className="text-sm text-gray-600">hours/day</span>
+                <span className="text-sm text-muted-foreground">hours/day</span>
               </div>
             </div>
 
@@ -116,7 +116,7 @@ export function ScheduleCalculator() {
                   step={0.5}
                   className="w-24"
                 />
-                <span className="text-sm text-gray-600">hours/day</span>
+                <span className="text-sm text-muted-foreground">hours/day</span>
               </div>
             </div>
           </div>
@@ -132,8 +132,8 @@ export function ScheduleCalculator() {
                   className={`
                     flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
                     ${restDays.includes(day.id)
-                      ? 'bg-red-50 border-red-400 text-red-700'
-                      : 'bg-white border-gray-200 hover:border-gray-300'
+                      ? 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-800 text-red-700 dark:text-red-400'
+                      : 'bg-card border-border hover:border-border/80'
                     }
                   `}
                 >
@@ -141,7 +141,7 @@ export function ScheduleCalculator() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-500">Click days to mark as rest days</p>
+            <p className="text-xs text-muted-foreground">Click days to mark as rest days</p>
           </div>
         </CardContent>
       </Card>
@@ -152,10 +152,10 @@ export function ScheduleCalculator() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+          <Card className="border-2 border-border bg-muted">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-600" />
+                <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 Your Completion Timeline
               </CardTitle>
             </CardHeader>
@@ -163,28 +163,28 @@ export function ScheduleCalculator() {
               {/* Hero Stats */}
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Target Completion</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm text-muted-foreground mb-1">Target Completion</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {format(schedule.endDate, 'MMM dd, yyyy')}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Days Required</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-sm text-muted-foreground mb-1">Days Required</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {schedule.totalDays}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Study Time</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-sm text-muted-foreground mb-1">Total Study Time</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {totalHours}h {totalMinutes}m
                   </p>
                 </div>
               </div>
 
               {/* Motivational Message */}
-              <div className="rounded-lg bg-white/80 p-4 border border-blue-200">
-                <p className="text-center text-gray-700 italic">
+              <div className="rounded-lg bg-card/80 p-4 border border-border">
+                <p className="text-center text-muted-foreground italic">
                   💪 Consistency is key to mastering this content!
                 </p>
               </div>
@@ -192,7 +192,7 @@ export function ScheduleCalculator() {
               {/* Daily Breakdown */}
               {schedule.dailySchedule.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">Daily Breakdown</h3>
+                  <h3 className="font-semibold text-foreground">Daily Breakdown</h3>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {schedule.dailySchedule.slice(0, 14).map((day, index) => (
                       <motion.div
@@ -200,24 +200,24 @@ export function ScheduleCalculator() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.03 }}
-                        className="flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200"
+                        className="flex items-center gap-4 p-3 rounded-lg bg-card border border-border"
                       >
                         <div className="min-w-[100px]">
                           <p className="text-sm font-medium">{format(day.date, 'EEE, MMM dd')}</p>
                         </div>
                         <div className="flex-1">
                           {day.hoursAllocated > 0 ? (
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-muted-foreground">
                               {day.hoursAllocated.toFixed(1)}h study time • {Math.floor(day.cumulativeMinutes / 60)}h {Math.floor(day.cumulativeMinutes % 60)}m total
                             </p>
                           ) : (
-                            <p className="text-sm text-gray-400 italic">Rest day</p>
+                            <p className="text-sm text-muted-foreground/70 italic">Rest day</p>
                           )}
                         </div>
                       </motion.div>
                     ))}
                     {schedule.dailySchedule.length > 14 && (
-                      <p className="text-sm text-gray-500 text-center py-2">
+                      <p className="text-sm text-muted-foreground text-center py-2">
                         + {schedule.dailySchedule.length - 14} more days...
                       </p>
                     )}

@@ -187,7 +187,7 @@ export function ExportMenu() {
                 )}
               </Button>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               This link contains your playlist data encoded in the URL. No server storage required!
             </p>
           </div>

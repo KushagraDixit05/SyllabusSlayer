@@ -16,6 +16,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Calendar, Zap, FileText, Plus, BookmarkPlus, Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { BackgroundBeams } from '@/components/ui/background-beams';
 
 export default function PlannerPage() {
   const [activeTab, setActiveTab] = useState<'partition' | 'schedule' | 'speed' | 'manual'>('partition');
@@ -82,8 +83,9 @@ export default function PlannerPage() {
 
   if (!hasVideos && showEmptyState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-        <div className="flex justify-end p-4">
+      <div className="min-h-screen bg-background relative">
+        <BackgroundBeams />
+        <div className="flex justify-end p-4 relative z-10">
           <ThemeToggle />
         </div>
         <div className="container mx-auto px-4 py-8">
@@ -91,26 +93,26 @@ export default function PlannerPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl bg-white dark:bg-gray-800 p-12 shadow-xl"
+              className="rounded-2xl bg-card text-card-foreground p-12 shadow-xl border relative z-10"
             >
-              <FileText className="mx-auto h-16 w-16 text-gray-400 mb-6" />
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              <FileText className="mx-auto h-16 w-16 text-muted-foreground mb-6" />
+              <h2 className="text-3xl font-bold text-foreground mb-4">
                 No Playlist Loaded
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+              <p className="text-lg text-muted-foreground mb-8">
                 Start by analyzing a YouTube playlist from the home page, or add videos manually.
               </p>
               <div className="flex gap-4 justify-center">
                 <a
                   href="/"
-                  className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-medium text-white hover:from-blue-700 hover:to-purple-700 transition-all"
+                  className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 transition-all"
                 >
                   <Calendar className="h-5 w-5" />
                   Analyze Playlist
                 </a>
                 <button
                   onClick={handleAddManually}
-                  className="flex items-center gap-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 px-6 py-3 font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                  className="flex items-center gap-2 rounded-lg border-2 border-border px-6 py-3 font-medium text-foreground hover:bg-accent transition-all"
                 >
                   <Plus className="h-5 w-5" />
                   Add Manually
@@ -124,22 +126,23 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background relative">
+      <BackgroundBeams />
       {/* Header */}
-      <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="flex items-center justify-center h-9 w-9 rounded-lg border border-border hover:bg-accent transition-colors"
                 title="Back to Dashboard"
               >
-                <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="h-4 w-4 text-muted-foreground" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{playlistTitle || 'Untitled Playlist'}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <h1 className="text-2xl font-bold text-foreground">{playlistTitle || 'Untitled Playlist'}</h1>
+                <p className="text-sm text-muted-foreground">
                   {videos.length} videos • {Math.floor(totalDuration / 60)} minutes total
                 </p>
               </div>
@@ -150,7 +153,7 @@ export default function PlannerPage() {
               <button
                 onClick={handleSaveToDashboard}
                 disabled={isSaving || !hasVideos}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-medium text-white hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -165,7 +168,7 @@ export default function PlannerPage() {
       </header>
 
       {/* Tab Navigation */}
-      <div className="border-b bg-white dark:bg-gray-900">
+      <div className="border-b bg-background">
         <div className="container mx-auto px-4">
           <nav className="flex gap-1">
             {[
@@ -184,8 +187,8 @@ export default function PlannerPage() {
                   className={`
                     flex items-center gap-2 px-6 py-3 font-medium transition-all relative
                     ${isActive 
-                      ? 'text-blue-600 dark:text-blue-400' 
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
                     }
                   `}
                 >
@@ -194,7 +197,7 @@ export default function PlannerPage() {
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
                   )}
@@ -206,7 +209,7 @@ export default function PlannerPage() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
