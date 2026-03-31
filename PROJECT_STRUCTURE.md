@@ -22,6 +22,7 @@ SyllabusSlayer/
 ├── 📄 PHASE_3B_SUMMARY.md
 ├── 📄 PHASE_3C_COMPLETE.md
 ├── 📄 PHASE_3D_PROMPT.md
+├── 📄 components.json                    ← Shadcn/UI + Aceternity registry config
 ├── 📄 package.json                       ← npm workspaces root
 ├── 📄 setup-phase3a.sh
 │
@@ -196,15 +197,17 @@ SyllabusSlayer/
     │   ├── 📂 theme/
     │   │   └── 📄 ThemeToggle.tsx
     │   │
-    │   └── 📂 ui/                        ← Radix UI primitives + custom (22 components)
+    │   └── 📂 ui/                        ← Radix UI + Aceternity + custom (27 components)
     │       ├── 📄 accordion.tsx
     │       ├── 📄 avatar.tsx
+    │       ├── 📄 background-beams.tsx    ← Aceternity UI
     │       ├── 📄 badge.tsx
     │       ├── 📄 button.tsx
     │       ├── 📄 card.tsx
     │       ├── 📄 checkbox.tsx
     │       ├── 📄 dialog.tsx
     │       ├── 📄 dropdown-menu.tsx
+    │       ├── 📄 glowing-effect.tsx      ← Aceternity UI
     │       ├── 📄 input.tsx
     │       ├── 📄 interactive-card.tsx
     │       ├── 📄 label.tsx
@@ -212,13 +215,16 @@ SyllabusSlayer/
     │       ├── 📄 scroll-area.tsx
     │       ├── 📄 select.tsx
     │       ├── 📄 separator.tsx
+    │       ├── 📄 sidebar.tsx
+    │       ├── 📄 skeleton.tsx
     │       ├── 📄 skeleton-variants.tsx
     │       ├── 📄 slider.tsx
     │       ├── 📄 switch.tsx
     │       ├── 📄 table.tsx
     │       ├── 📄 tabs.tsx
     │       ├── 📄 textarea.tsx
-    │       └── 📄 tooltip.tsx
+    │       ├── 📄 tooltip.tsx
+    │       └── 📄 wavy-background.tsx     ← Aceternity UI
     │
     ├── 📂 hooks/
     │   ├── 📄 usePlaylist.ts
@@ -298,8 +304,8 @@ SyllabusSlayer/
 | **Phase 3B** | +14 | Dark mode, command palette, animations, toasts |
 | **Phase 3C** | +16 | Achievements, leaderboard, progress tracking |
 | **Phase 3D** | +15 | Analytics, onboarding, email, error boundary, polish |
-| **Post-3D** | +7 | Playlists page, search page, analytics fix, nav updates |
-| **Total** | **~128 files** | Complete implementation |
+| **Post-3D** | +12 | Playlists page, search page, analytics fix, nav updates, Aceternity UI |
+| **Total** | **~133 files** | Complete implementation |
 
 ## 🔑 Key Files by Concern
 

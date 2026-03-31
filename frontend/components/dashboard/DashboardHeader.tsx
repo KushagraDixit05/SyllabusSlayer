@@ -9,7 +9,12 @@ import { Badge } from '@/components/ui/badge'
 import { Search, Bell } from 'lucide-react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  currentStreak?: number
+  hoursSaved?: number
+}
+
+export function DashboardHeader({ currentStreak = 0, hoursSaved = 0 }: DashboardHeaderProps) {
   const { data: session } = useSession()
   const [pageScroll, setPageScroll] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -22,9 +27,8 @@ export function DashboardHeader() {
 
   return (
     <div
-      className={`w-full h-16 z-10 bg-black text-white duration-300 ease-in transition-all ${
-        pageScroll ? 'backdrop-blur-md bg-black/80' : ''
-      }`}
+      className={`w-full h-16 z-10 bg-black text-white duration-300 ease-in transition-all ${pageScroll ? 'backdrop-blur-md bg-black/80' : ''
+        }`}
     >
       <div className="flex justify-between items-center w-full h-full mx-auto px-6">
         {/* Left: Search */}
@@ -48,13 +52,13 @@ export function DashboardHeader() {
             <div className="flex items-center space-x-2">
               <span className="text-white/60">Streak:</span>
               <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                7 days 🔥
+                {currentStreak} days 🔥
               </Badge>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-white/60">Hours saved:</span>
               <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                47h
+                {hoursSaved}h
               </Badge>
             </div>
           </div>
@@ -94,9 +98,8 @@ export function DashboardHeader() {
 
       {/* Mobile drawer */}
       <div
-        className={`fixed top-0 ${
-          mobileOpen ? 'left-0' : 'left-[-100%]'
-        } w-4/5 h-full bg-gradient-to-b from-gray-900 to-black text-white p-10 ease-in duration-300 z-50 flex flex-col gap-8`}
+        className={`fixed top-0 ${mobileOpen ? 'left-0' : 'left-[-100%]'
+          } w-4/5 h-full bg-gradient-to-b from-gray-900 to-black text-white p-10 ease-in duration-300 z-50 flex flex-col gap-8`}
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between">
@@ -110,11 +113,11 @@ export function DashboardHeader() {
         <div className="flex flex-col gap-4 text-sm">
           <div className="flex items-center justify-between border border-white/10 rounded-lg p-3">
             <span className="text-white/60">Streak</span>
-            <Badge variant="secondary" className="bg-white/10 text-white">7 days 🔥</Badge>
+            <Badge variant="secondary" className="bg-white/10 text-white">{currentStreak} days 🔥</Badge>
           </div>
           <div className="flex items-center justify-between border border-white/10 rounded-lg p-3">
             <span className="text-white/60">Hours saved</span>
-            <Badge variant="secondary" className="bg-white/10 text-white">47h</Badge>
+            <Badge variant="secondary" className="bg-white/10 text-white">{hoursSaved}h</Badge>
           </div>
         </div>
 

@@ -50,13 +50,18 @@ This stack prioritizes:
 
 ### **Shadcn/UI**
 **Why:** Beautifully designed, accessible component library
-**Implementation Status:** ✅ **11 components integrated**
+**Implementation Status:** ✅ **27 components integrated**
 
 **Integrated Components:**
 - `button.tsx`, `input.tsx`, `label.tsx`
 - `card.tsx`, `badge.tsx`, `checkbox.tsx`
 - `dialog.tsx`, `textarea.tsx`
 - `dropdown-menu.tsx`, `accordion.tsx`, `slider.tsx`
+- `avatar.tsx`, `scroll-area.tsx`, `select.tsx`
+- `separator.tsx`, `switch.tsx`, `table.tsx`
+- `tabs.tsx`, `tooltip.tsx`, `progress.tsx`
+- `interactive-card.tsx`, `skeleton.tsx`, `skeleton-variants.tsx`
+- `sidebar.tsx`, `background-beams.tsx`, `glowing-effect.tsx`, `wavy-background.tsx`
 
 **Not a Traditional Library:**
 - Components are *copied into your project* (full ownership)
@@ -76,10 +81,15 @@ This stack prioritizes:
 - `@radix-ui/react-slot` `^1.2.3`
 - `@radix-ui/react-label` `^2.1.8`
 - `@radix-ui/react-accordion` `^1.1.2`
+- `@radix-ui/react-avatar`
 - `@radix-ui/react-checkbox` `^1.0.4`
 - `@radix-ui/react-dialog` `^1.0.5`
 - `@radix-ui/react-dropdown-menu` `^2.0.6`
+- `@radix-ui/react-scroll-area`
+- `@radix-ui/react-select`
 - `@radix-ui/react-slider` `^1.1.2`
+- `@radix-ui/react-tabs`
+- `@radix-ui/react-tooltip`
 
 **Where Shadcn Doesn't Cover:**
 - Complex interactions (Accordion, Slider, Switch)
@@ -487,9 +497,14 @@ toast.error('Failed to fetch playlist')
 **Current Versions:**
 - `@dnd-kit/core`: `^6.3.1`
 - `@dnd-kit/sortable`: `^10.0.0`
-**Status:** 📦 **Installed, awaiting integration**
+**Status:** 📦 **Installed, awaiting full drag-and-drop integration**
 
 **Planned Use:** Drag-and-drop video reordering in manual entry
+
+### **Aceternity UI**
+**Status:** ✅ **Integrated via registry**
+**Components:** `background-beams.tsx`, `glowing-effect.tsx`, `wavy-background.tsx`
+**Config:** Registered in `components.json` under `@aceternity` registry
 
 ---
 

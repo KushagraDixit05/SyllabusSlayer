@@ -130,82 +130,84 @@ export function PlaylistsClient({ playlists }: PlaylistsClientProps) {
           {filtered.map((playlist) => {
             const status = STATUS_LABELS[playlist.status] ?? STATUS_LABELS.planning
             return (
-              <Card key={playlist.id} className="flex flex-col hover:shadow-md transition-shadow">
-                {/* Thumbnail */}
-                {playlist.thumbnail_url ? (
-                  <div className="relative h-40 overflow-hidden rounded-t-lg">
-                    <img
-                      src={playlist.thumbnail_url}
-                      alt={playlist.title}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  </div>
-                ) : (
-                  <div className="flex h-40 items-center justify-center rounded-t-lg bg-gradient-to-br from-primary/10 to-primary/30">
-                    <ListVideo className="h-12 w-12 text-primary/60" />
-                  </div>
-                )}
-
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base line-clamp-2 leading-snug">
-                      {playlist.title}
-                    </CardTitle>
-                    <span
-                      className={cn(
-                        'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
-                        status.color
-                      )}
-                    >
-                      {status.icon}
-                      {status.label}
-                    </span>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="flex-1 flex flex-col justify-between gap-4">
-                  {/* Stats */}
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <ListVideo className="h-3.5 w-3.5" />
-                      {playlist.video_count} videos
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" />
-                      {formatDuration(playlist.total_duration)}
-                    </span>
-                  </div>
-
-                  {/* Progress */}
-                  {playlist.status !== 'planning' && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Progress</span>
-                        <span>{Math.round(playlist.completion_percentage)}%</span>
-                      </div>
-                      <Progress value={playlist.completion_percentage} className="h-1.5" />
+              <Link key={playlist.id} href={`/dashboard/playlists/${playlist.id}`}>
+                <Card className="flex flex-col hover:shadow-md transition-shadow cursor-pointer">
+                  {/* Thumbnail */}
+                  {playlist.thumbnail_url ? (
+                    <div className="relative h-40 overflow-hidden rounded-t-lg">
+                      <img
+                        src={playlist.thumbnail_url}
+                        alt={playlist.title}
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    </div>
+                  ) : (
+                    <div className="flex h-40 items-center justify-center rounded-t-lg bg-gradient-to-br from-primary/10 to-primary/30">
+                      <ListVideo className="h-12 w-12 text-primary/60" />
                     </div>
                   )}
 
-                  {/* Footer */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(playlist.created_at), { addSuffix: true })}
-                    </span>
-                    {playlist.youtube_playlist_id && (
-                      <a
-                        href={`https://www.youtube.com/playlist?list=${playlist.youtube_playlist_id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline"
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-base line-clamp-2 leading-snug">
+                        {playlist.title}
+                      </CardTitle>
+                      <span
+                        className={cn(
+                          'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                          status.color
+                        )}
                       >
-                        View on YouTube
-                      </a>
+                        {status.icon}
+                        {status.label}
+                      </span>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="flex-1 flex flex-col justify-between gap-4">
+                    {/* Stats */}
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <ListVideo className="h-3.5 w-3.5" />
+                        {playlist.video_count} videos
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" />
+                        {formatDuration(playlist.total_duration)}
+                      </span>
+                    </div>
+
+                    {/* Progress */}
+                    {playlist.status !== 'planning' && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Progress</span>
+                          <span>{Math.round(playlist.completion_percentage)}%</span>
+                        </div>
+                        <Progress value={playlist.completion_percentage} className="h-1.5" />
+                      </div>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(playlist.created_at), { addSuffix: true })}
+                      </span>
+                      {playlist.youtube_playlist_id && (
+                        <a
+                          href={`https://www.youtube.com/playlist?list=${playlist.youtube_playlist_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline"
+                        >
+                          View on YouTube
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             )
           })}
         </div>

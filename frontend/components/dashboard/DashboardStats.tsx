@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { GlowingEffect } from '@/components/ui/glowing-effect'
 import { BookOpen, CheckCircle2, Clock, Flame } from 'lucide-react'
 import type { UserProfile } from '@/types/database'
 
@@ -44,19 +45,30 @@ export function DashboardStats({ userProfile }: DashboardStatsProps) {
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <Card key={stat.name}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {stat.name}
-            </CardTitle>
-            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-          </CardContent>
-        </Card>
+        <div key={stat.name} className="relative rounded-2xl border p-2">
+          <GlowingEffect
+            blur={0}
+            borderWidth={3}
+            spread={80}
+            glow={true}
+            disabled={false}
+            proximity={64}
+            inactiveZone={0.01}
+          />
+          <Card className="h-full border-0 shadow-none bg-transparent">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.name}
+              </CardTitle>
+              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+            </CardContent>
+          </Card>
+        </div>
       ))}
     </div>
   )

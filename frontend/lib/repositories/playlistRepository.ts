@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import type { Playlist, PlaylistInsert, PlaylistUpdate, Video, VideoInsert } from '@/types/database'
+import type { Playlist, PlaylistInsert, PlaylistUpdate, Video, VideoInsert, VideoUpdate } from '@/types/database'
 
 export class PlaylistRepository {
   private supabase = createClient()
@@ -12,8 +12,8 @@ export class PlaylistRepository {
       .single()
 
     if (error) {
-      console.error('Error creating playlist:', error)
-      return null
+      console.error('Error creating playlist:', error.message, error.details, error.hint)
+      throw new Error(`Database error: ${error.message}`)
     }
 
     return playlist
@@ -39,10 +39,10 @@ export class PlaylistRepository {
       .select()
 
     if (videosError) {
-      console.error('Error creating videos:', videosError)
+      console.error('Error creating videos:', videosError.message, videosError.details)
       // Roll back playlist creation if videos fail
       await this.delete(playlist.id)
-      return null
+      throw new Error(`Failed to save videos: ${videosError.message}`)
     }
 
     return { playlist, videos: createdVideos }
@@ -158,6 +158,42 @@ export class PlaylistRepository {
       status,
       ...(percentage === 100 && { completed_at: new Date().toISOString() }),
     })
+  }
+
+  async getVideosByPlaylistId(playlistId: string): Promise<Video[]> {
+    const { data, error } = await this.supabase
+      .from('videos')
+      .select('*')
+      .eq('playlist_id', playlistId)
+      .order('position', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching videos:', error)
+      return []
+    }
+
+    return data
+  }
+
+  async toggleVideoCompletion(videoId: string, isCompleted: boolean): Promise<Video | null> {
+    const updates: VideoUpdate = {
+      is_completed: isCompleted,
+      completed_at: isCompleted ? new Date().toISOString() : null,
+    }
+
+    const { data, error } = await this.supabase
+      .from('videos')
+      .update(updates)
+      .eq('id', videoId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error toggling video completion:', error)
+      return null
+    }
+
+    return data
   }
 }
 

@@ -7,12 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for Phase 3
-- Premium dashboard redesign with dark mode
-- User authentication system
-- Progress tracking and analytics
-- Achievement badges and gamification
-- Enhanced onboarding flow
+### Planned for Phase 4
+- Browser extension (Chrome/Firefox/Edge)
+- Mobile applications (iOS/Android)
+- Premium tier with Stripe integration
+- AI-powered insights and recommendations
+- Calendar integration (.ics export)
+- Collaboration / study group features
+
+## [3.0.0] - 2026-02-28
+
+### Phase 3: Auth, Dashboard, Gamification, Analytics & Polish - COMPLETE ✅
+
+#### Phase 3A — Authentication & Database
+- **NextAuth.js v5** with Google & GitHub OAuth providers
+- **Supabase (PostgreSQL)** database with Row-Level Security (RLS)
+- **Repository layer:** PlaylistRepository, UserRepository, AchievementRepository, LeaderboardRepository
+- Database schema with 9 tables (`user_profiles`, `playlists`, `videos`, `partitions`, `schedules`, `achievements`, `activity_log`, `templates`, leaderboard materialized view)
+- Automated triggers for profile creation and stat counters
+- Protected dashboard with sidebar navigation
+- Auth middleware for route protection (`middleware.ts`)
+
+#### Phase 3B — Premium UI & Dark Mode
+- **Dark mode** via `next-themes` (system/light/dark toggle, persisted to `user_profiles.theme_preference`)
+- **Command palette** (`Cmd+K`) via `cmdk`
+- **Framer Motion** page transitions, sidebar collapse animations, counting numbers
+- **Toast notifications** via `sonner`
+- Grid/list/compact view controls (`useViewStore`)
+- Dashboard sidebar with 8 navigation items
+- Landing page components (HeroSection, FeaturesSection, HowItWorks, LandingFooter)
+
+#### Phase 3C — Gamification & Progress Tracking
+- **12 achievement definitions** with unlock detection engine (`lib/achievements/checker.ts`)
+- **Leaderboard** with materialized view, opt-in dialog, tabbed display (hours / streak / completion)
+- **Progress tracking:** streaks, activity heatmap, circular progress rings
+- **Milestone celebrations** with confetti (`react-confetti`)
+- `GlobalAchievementNotifier` component polls store and triggers unlock modals
+- Database migration: `supabase/migrations/phase3c-gamification.sql`
+
+#### Phase 3D — Analytics, Onboarding & Email
+- **Analytics dashboard:** InsightCards + MonthlyProgressChart (Recharts)
+- **Guided onboarding tour** via `shepherd.js` (5-step tour, auto-starts for new users)
+- **Email templates** with `@react-email/components` + Resend SDK
+  - `AchievementUnlocked.tsx`, `WeeklySummary.tsx`
+  - `EmailService` with `sendAchievementUnlocked()`, `sendWeeklySummary()`, `sendStreakReminder()`
+- **Error boundary** component for graceful error handling
+- **Performance utilities** (`lib/utils/performance.ts`)
+- Settings & Help pages
+
+#### Post-3D Polish
+- **Playlist library page** (`/dashboard/playlists`) with filter tabs & search
+- **Dashboard search page** (`/dashboard/search`) with full-text filtering
+- Analytics server→client split (`AnalyticsContent` wrapper — required because lucide icons can't be passed from Server to Client Components)
+- Planner ↔ Dashboard navigation link
+- `shepherd.js` direct integration (replaced `react-shepherd` bundled React conflicts)
+
+#### New UI Components (27 total, up from 11)
+- `avatar.tsx`, `scroll-area.tsx`, `select.tsx`, `separator.tsx`, `switch.tsx`
+- `table.tsx`, `tabs.tsx`, `tooltip.tsx`, `progress.tsx`
+- `interactive-card.tsx`, `skeleton-variants.tsx`, `skeleton.tsx`
+- `sidebar.tsx`, `background-beams.tsx`, `glowing-effect.tsx`, `wavy-background.tsx`
+
+#### New Zustand Stores (5 total)
+- `usePlannerStore.ts` — playlist & partition state
+- `useSavedPlaylistStore.ts` — DB-synced playlists + achievements
+- `useUIStore.ts` — loading/error global state
+- `useViewStore.ts` — grid/list/compact view preferences
+- `useOnboardingStore.ts` — onboarding tour state (Phase 3D)
+
+#### Dependencies Added
+```json
+{
+  "@auth/supabase-adapter": "latest",
+  "@supabase/ssr": "latest",
+  "@supabase/supabase-js": "latest",
+  "next-auth": "latest",
+  "next-themes": "latest",
+  "cmdk": "latest",
+  "react-confetti": "latest",
+  "react-shepherd": "latest",
+  "recharts": "latest",
+  "resend": "latest",
+  "@react-email/components": "latest",
+  "@dnd-kit/core": "^6.3.1",
+  "@dnd-kit/sortable": "^10.0.0",
+  "@tabler/icons-react": "latest",
+  "react-icons": "latest",
+  "motion": "latest",
+  "simplex-noise": "latest"
+}
+```
 
 ## [2.0.0] - 2026-02-15
 

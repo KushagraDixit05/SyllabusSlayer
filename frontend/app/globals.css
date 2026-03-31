@@ -98,3 +98,41 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-muted-foreground/50;
 }
+
+/* SchemaCard-inspired styles */
+.glass {
+  @apply bg-white/5 backdrop-blur-md;
+}
+
+.card-border {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.3) 0%, rgba(147, 51, 234, 0.15) 50%, rgba(79, 70, 229, 0.3) 100%);
+  padding: 1px;
+}
+
+.card-border > * {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.gradient-border {
+  border: 1px solid transparent;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)) padding-box,
+              linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(147, 51, 234, 0.3), rgba(99, 102, 241, 0.5)) border-box;
+}
+
+.inner-glow {
+  box-shadow: inset 0 0 30px rgba(99, 102, 241, 0.15),
+              inset 0 0 60px rgba(147, 51, 234, 0.1);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}

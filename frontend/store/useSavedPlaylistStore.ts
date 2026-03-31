@@ -15,16 +15,16 @@ interface SavedPlaylistState {
   savedPlaylists: Playlist[]
   currentPlaylist: Playlist | null
   currentVideos: Video[]
-  
+
   // Loading states
   isLoading: boolean
   isSaving: boolean
   error: string | null
-  
+
   // Achievement notifications
   pendingAchievements: AchievementDefinition[]
   dismissAchievement: () => void
-  
+
   // Actions - Database operations
   loadUserPlaylists: (userId: string) => Promise<void>
   loadPlaylist: (playlistId: string) => Promise<void>
@@ -32,7 +32,8 @@ interface SavedPlaylistState {
   deletePlaylist: (playlistId: string) => Promise<void>
   updatePlaylistProgress: (playlistId: string, percentage: number) => Promise<void>
   markPlaylistComplete: (playlistId: string, userId?: string) => Promise<void>
-  
+  toggleVideoCompletion: (videoId: string, playlistId: string, isCompleted: boolean) => Promise<void>
+
   // Actions - Local state
   setCurrentPlaylist: (playlist: Playlist | null) => void
   setCurrentVideos: (videos: Video[]) => void
@@ -58,9 +59,9 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
       const playlists = await playlistRepository.getByUserId(userId)
       set({ savedPlaylists: playlists, isLoading: false })
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to load playlists', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to load playlists',
+        isLoading: false
       })
     }
   },
@@ -79,9 +80,9 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
         set({ error: 'Playlist not found', isLoading: false })
       }
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to load playlist', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to load playlist',
+        isLoading: false
       })
     }
   },
@@ -93,7 +94,7 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
         { ...playlistData, user_id: userId } as any,
         videos
       )
-      
+
       if (result) {
         // Add to saved playlists
         set((state) => ({
@@ -117,13 +118,13 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
 
         return result.playlist
       }
-      
+
       set({ error: 'Failed to save playlist', isSaving: false })
       return null
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to save playlist', 
-        isSaving: false 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to save playlist',
+        isSaving: false
       })
       return null
     }
@@ -144,9 +145,9 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
         set({ error: 'Failed to delete playlist', isLoading: false })
       }
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to delete playlist', 
-        isLoading: false 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to delete playlist',
+        isLoading: false
       })
     }
   },
@@ -198,4 +199,40 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
   setCurrentVideos: (videos) => set({ currentVideos: videos }),
   clearCurrent: () => set({ currentPlaylist: null, currentVideos: [] }),
   clearError: () => set({ error: null }),
+
+  toggleVideoCompletion: async (videoId: string, playlistId: string, isCompleted: boolean) => {
+    try {
+      const updatedVideo = await playlistRepository.toggleVideoCompletion(videoId, isCompleted)
+      if (!updatedVideo) {
+        set({ error: 'Failed to update video' })
+        return
+      }
+
+      // Update local currentVideos state
+      const currentVideos = [...(useSavedPlaylistStore.getState().currentVideos)]
+      const updatedVideos = currentVideos.map((v) =>
+        v.id === videoId ? { ...v, is_completed: isCompleted, completed_at: isCompleted ? new Date().toISOString() : null } : v
+      )
+      set({ currentVideos: updatedVideos })
+
+      // Recalculate and persist playlist progress
+      const totalVideos = updatedVideos.length
+      const completedCount = updatedVideos.filter((v) => v.is_completed).length
+      const percentage = totalVideos > 0 ? Math.round((completedCount / totalVideos) * 100) : 0
+
+      await playlistRepository.updateProgress(playlistId, percentage)
+      set((state) => ({
+        savedPlaylists: state.savedPlaylists.map((p) =>
+          p.id === playlistId
+            ? { ...p, completion_percentage: percentage, status: percentage === 100 ? 'completed' : 'in_progress' }
+            : p
+        ),
+        currentPlaylist: state.currentPlaylist?.id === playlistId
+          ? { ...state.currentPlaylist, completion_percentage: percentage, status: percentage === 100 ? 'completed' : 'in_progress' }
+          : state.currentPlaylist,
+      }))
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to toggle video completion' })
+    }
+  },
 }))
