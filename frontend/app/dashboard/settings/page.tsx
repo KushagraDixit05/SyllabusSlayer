@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { Bell, Mail, Shield, Palette } from 'lucide-react'
+import { Bell, Mail, Shield, Palette, Sun, Moon, Monitor } from 'lucide-react'
 
 interface EmailPreferences {
   achievementEmails: boolean
@@ -16,6 +17,7 @@ interface EmailPreferences {
 }
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme()
   const [emailPrefs, setEmailPrefs] = useState<EmailPreferences>({
     achievementEmails: true,
     weeklySummary: true,
@@ -151,10 +153,54 @@ export default function SettingsPage() {
           </div>
           <CardDescription>Customize the look and feel</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Theme settings are available in the top navigation bar. Click the sun/moon icon to toggle between light and dark mode.
-          </p>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <Label className="text-base">Theme</Label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => setTheme('light')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                  theme === 'light' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                <Sun className={`h-5 w-5 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`}>
+                  Light
+                </span>
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                  theme === 'dark' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                <Moon className={`h-5 w-5 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`}>
+                  Dark
+                </span>
+              </button>
+              <button
+                onClick={() => setTheme('system')}
+                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                  theme === 'system' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                <Monitor className={`h-5 w-5 ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`}>
+                  System
+                </span>
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              System theme follows your device&apos;s appearance settings
+            </p>
+          </div>
         </CardContent>
       </Card>
 

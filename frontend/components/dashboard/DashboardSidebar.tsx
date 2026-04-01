@@ -15,7 +15,6 @@ import {
   Settings,
   HelpCircle,
   Plus,
-  BookOpen,
   Search,
   LogOut,
 } from 'lucide-react'
@@ -23,11 +22,10 @@ import {
 const navigation = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Playlists', href: '/dashboard/playlists', icon: ListVideo },
-  { label: 'Planner', href: '/planner', icon: BookOpen },
+  { label: 'New Playlist', href: '/planner', icon: Plus },
   { label: 'Search', href: '/dashboard/search', icon: Search },
   { label: 'Achievements', href: '/dashboard/achievements', icon: Trophy },
   { label: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
-  { label: 'New Playlist', href: '/planner', icon: Plus },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings },
   { label: 'Help', href: '/dashboard/help', icon: HelpCircle },
 ]

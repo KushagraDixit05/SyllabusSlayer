@@ -439,8 +439,8 @@ After successful setup:
 
 1. **Read the documentation:**
    - [ARCHITECTURE.md](./ARCHITECTURE.md) - Understand the system design
-   - [backend/README.md](./backend/README.md) - Backend API details
-   - [frontend/README.md](./frontend/README.md) - Frontend guide
+   - [QUICK_START.md](./QUICK_START.md) - Quick usage guide
+   - [PHASE_3.md](./PHASE_3.md) - Phase 3 features
 
 2. **Explore the code:**
    - Start with `backend/src/app.ts` and `frontend/app/page.tsx`
@@ -455,7 +455,7 @@ After successful setup:
 
 If you encounter issues not covered here:
 
-1. Check existing documentation
+1. Check existing documentation in `documents/` folder
 2. Review error logs in terminal
 3. Verify environment variables
 4. Check YouTube API quota in Google Cloud Console

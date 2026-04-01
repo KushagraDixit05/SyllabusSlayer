@@ -9,210 +9,271 @@ import { format } from 'date-fns';
 import type { PDFExportData } from '@/types/export';
 import { formatDurationText } from './partitioning';
 
+// Colors
+const COLORS = {
+  primary: [99, 102, 241] as [number, number, number],     // indigo-500
+  primaryDark: [79, 70, 229] as [number, number, number],  // indigo-600
+  gray100: [243, 244, 246] as [number, number, number],
+  gray200: [229, 231, 235] as [number, number, number],
+  gray500: [107, 114, 128] as [number, number, number],
+  gray700: [55, 65, 81] as [number, number, number],
+  white: [255, 255, 255] as [number, number, number],
+};
+
 /**
  * Generate professional study plan PDF
  */
 export function generateStudyPlanPDF(data: PDFExportData): void {
   const doc = new jsPDF();
-  let yPosition = 20;
+  const pageWidth = doc.internal.pageSize.width;
+  let y = 0;
   
-  // ====== HEADER ======
-  doc.setFontSize(24);
+  // ====== HEADER WITH ACCENT BAR ======
+  // Indigo accent bar at top
+  doc.setFillColor(...COLORS.primary);
+  doc.rect(0, 0, pageWidth, 8, 'F');
+  
+  y = 25;
+  
+  // Title
+  doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text('Study Plan', 20, yPosition);
-  yPosition += 10;
+  doc.setTextColor(...COLORS.gray700);
+  doc.text('Study Plan', 20, y);
   
-  doc.setFontSize(16);
+  // Generated date (right aligned)
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.gray500);
+  doc.text(format(data.generatedDate, 'MMM d, yyyy'), pageWidth - 20, y, { align: 'right' });
+  
+  y += 10;
+  
+  // Playlist title
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.gray700);
   const titleLines = doc.splitTextToSize(data.playlistTitle, 170);
-  doc.text(titleLines, 20, yPosition);
-  yPosition += titleLines.length * 7 + 10;
+  doc.text(titleLines, 20, y);
+  y += titleLines.length * 6 + 12;
   
-  // ====== SUMMARY SECTION ======
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Summary', 20, yPosition);
-  yPosition += 8;
+  // ====== SUMMARY BOX ======
+  const boxHeight = 32;
+  doc.setFillColor(...COLORS.gray100);
+  doc.roundedRect(20, y, pageWidth - 40, boxHeight, 3, 3, 'F');
   
-  doc.setFont('helvetica', 'normal');
-  const summaryData = [
-    ['Total Duration', data.totalDuration],
-    ['Video Count', data.videoCount.toString()],
-    ['Playback Speed', `${data.speed}x`],
-    ['Sessions', data.partitions.length.toString()],
+  // Summary stats in horizontal layout
+  const stats = [
+    { label: 'Videos', value: data.videoCount.toString() },
+    { label: 'Duration', value: data.totalDuration },
+    { label: 'Speed', value: `${data.speed}×` },
+    { label: 'Sessions', value: data.partitions.length.toString() },
   ];
   
-  summaryData.forEach(([label, value]) => {
+  const statWidth = (pageWidth - 40) / stats.length;
+  stats.forEach((stat, i) => {
+    const x = 20 + statWidth * i + statWidth / 2;
+    
+    // Value
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${label}:`, 25, yPosition);
+    doc.setTextColor(...COLORS.primaryDark);
+    doc.text(stat.value, x, y + 14, { align: 'center' });
+    
+    // Label
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(value, 75, yPosition);
-    yPosition += 7;
+    doc.setTextColor(...COLORS.gray500);
+    doc.text(stat.label, x, y + 24, { align: 'center' });
   });
   
-  yPosition += 5;
+  y += boxHeight + 15;
   
-  // ====== PARTITIONS TABLE ======
+  // ====== STUDY SESSIONS TABLE ======
   if (data.partitions.length > 0) {
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Study Sessions', 20, yPosition);
-    yPosition += 8;
+    doc.setTextColor(...COLORS.gray700);
+    doc.text('Study Sessions', 20, y);
+    y += 8;
     
-    const partitionRows = data.partitions.map(p => [
-      `Session ${p.sessionNumber}`,
-      `${p.startVideoIndex + 1}-${p.endVideoIndex + 1}`,
-      `${p.videos.length}`,
+    const partitionRows = data.partitions.map((p, idx) => [
+      `Session ${idx + 1}`,
+      `Videos ${p.startVideoIndex + 1}–${p.endVideoIndex + 1}`,
+      p.videos.length.toString(),
       formatDurationText(p.totalDuration),
       '☐',
     ]);
     
     autoTable(doc, {
-      startY: yPosition,
-      head: [['Session', 'Videos', 'Count', 'Duration', 'Complete']],
+      startY: y,
+      head: [['Session', 'Range', 'Videos', 'Duration', '✓']],
       body: partitionRows,
-      theme: 'grid',
+      theme: 'plain',
       headStyles: {
-        fillColor: [59, 130, 246], // blue-600
-        fontSize: 10,
+        fillColor: COLORS.primary,
+        textColor: COLORS.white,
+        fontSize: 9,
         fontStyle: 'bold',
+        cellPadding: 5,
       },
-      styles: {
+      bodyStyles: {
         fontSize: 9,
         cellPadding: 4,
       },
-      columnStyles: {
-        4: { halign: 'center' },
+      alternateRowStyles: {
+        fillColor: COLORS.gray100,
       },
+      columnStyles: {
+        0: { cellWidth: 35, fontStyle: 'bold' },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 25, halign: 'center' },
+        3: { cellWidth: 35, halign: 'right' },
+        4: { cellWidth: 20, halign: 'center' },
+      },
+      margin: { left: 20, right: 20 },
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 10;
+    y = (doc as any).lastAutoTable.finalY + 15;
   }
   
   // ====== SCHEDULE SECTION ======
   if (data.schedule) {
     // Check if we need a new page
-    if (yPosition > 240) {
+    if (y > 220) {
       doc.addPage();
-      yPosition = 20;
+      y = 20;
     }
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Schedule', 20, yPosition);
-    yPosition += 8;
+    doc.setTextColor(...COLORS.gray700);
+    doc.text('Schedule Overview', 20, y);
+    y += 10;
+    
+    // Schedule summary in compact format
+    const scheduleStart = format(data.schedule.startDate, 'MMM d, yyyy');
+    const scheduleEnd = format(data.schedule.endDate, 'MMM d, yyyy');
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    const scheduleInfo = [
-      `Start Date: ${format(data.schedule.startDate, 'MMM d, yyyy')}`,
-      `End Date: ${format(data.schedule.endDate, 'MMM d, yyyy')}`,
-      `Total Days: ${data.schedule.totalDays}`,
-      `Study Days: ${data.schedule.studyDays}`,
-      `Rest Days: ${data.schedule.restDays}`,
-    ];
+    doc.setTextColor(...COLORS.gray500);
+    doc.text(`${scheduleStart} → ${scheduleEnd}  •  ${data.schedule.studyDays} study days  •  ${data.schedule.restDays} rest days`, 20, y);
+    y += 12;
     
-    scheduleInfo.forEach(info => {
-      doc.text(info, 25, yPosition);
-      yPosition += 6;
-    });
-    
-    yPosition += 5;
-    
-    // Daily schedule table (first 30 days or all if less)
-    const daysToShow = data.schedule.dailySchedule.slice(0, 30);
+    // Daily schedule table (compact, first 20 days)
+    const daysToShow = data.schedule.dailySchedule.slice(0, 20);
     const scheduleRows = daysToShow.map(day => [
       format(day.date, 'MMM d'),
       day.dayOfWeek.substring(0, 3),
       day.isRestDay ? 'Rest' : `${day.hoursAllocated.toFixed(1)}h`,
-      day.sessionsScheduled.join(', ') || '-',
+      day.isRestDay ? '—' : (day.sessionsScheduled.join(', ') || '—'),
     ]);
     
     autoTable(doc, {
-      startY: yPosition,
+      startY: y,
       head: [['Date', 'Day', 'Hours', 'Sessions']],
       body: scheduleRows,
-      theme: 'striped',
+      theme: 'plain',
       headStyles: {
-        fillColor: [139, 92, 246], // purple-600
-        fontSize: 9,
+        fillColor: COLORS.gray200,
+        textColor: COLORS.gray700,
+        fontSize: 8,
         fontStyle: 'bold',
+        cellPadding: 4,
       },
-      styles: {
+      bodyStyles: {
         fontSize: 8,
         cellPadding: 3,
       },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 25, halign: 'center' },
+        3: { cellWidth: 60 },
+      },
+      margin: { left: 20, right: 20 },
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 5;
+    y = (doc as any).lastAutoTable.finalY + 5;
     
-    if (data.schedule.dailySchedule.length > 30) {
+    if (data.schedule.dailySchedule.length > 20) {
       doc.setFontSize(8);
-      doc.setTextColor(100);
-      doc.text(`... and ${data.schedule.dailySchedule.length - 30} more days`, 25, yPosition);
-      yPosition += 10;
+      doc.setTextColor(...COLORS.gray500);
+      doc.text(`+ ${data.schedule.dailySchedule.length - 20} more days`, 20, y);
+      y += 10;
     }
   }
   
-  // ====== VIDEO LIST (if requested) ======
+  // ====== VIDEO LIST (compact) ======
   if (data.includeVideos && data.videos && data.videos.length > 0) {
+    // Add new page for video list
     doc.addPage();
-    yPosition = 20;
+    y = 20;
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(0);
-    doc.text('Video List', 20, yPosition);
-    yPosition += 8;
+    doc.setTextColor(...COLORS.gray700);
+    doc.text(`Video List (${data.videos.length} videos)`, 20, y);
+    y += 8;
     
+    // Show all videos in compact table
     const videoRows = data.videos.map((v, idx) => [
       (idx + 1).toString(),
-      v.title.length > 60 ? v.title.substring(0, 57) + '...' : v.title,
+      v.title.length > 55 ? v.title.substring(0, 52) + '...' : v.title,
       formatDurationText(v.duration),
     ]);
     
     autoTable(doc, {
-      startY: yPosition,
-      head: [['#', 'Title', 'Duration']],
+      startY: y,
+      head: [['#', 'Video Title', 'Length']],
       body: videoRows,
       theme: 'plain',
       headStyles: {
-        fillColor: [243, 244, 246], // gray-100
-        textColor: [0, 0, 0],
-        fontSize: 9,
+        fillColor: COLORS.gray100,
+        textColor: COLORS.gray700,
+        fontSize: 8,
         fontStyle: 'bold',
+        cellPadding: 4,
       },
-      styles: {
+      bodyStyles: {
         fontSize: 8,
         cellPadding: 3,
       },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 140 },
-        2: { cellWidth: 25, halign: 'right' },
+      alternateRowStyles: {
+        fillColor: [252, 252, 252],
       },
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 140 },
+        2: { cellWidth: 22, halign: 'right' },
+      },
+      margin: { left: 20, right: 20 },
     });
   }
   
-  // ====== FOOTER ======
+  // ====== FOOTER ON ALL PAGES ======
   const pageCount = doc.getNumberOfPages();
-  doc.setFontSize(8);
-  doc.setTextColor(128);
   
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.text(
-      `Generated by Syllabus Slayer on ${format(data.generatedDate, 'PPP')}`,
-      20,
-      doc.internal.pageSize.height - 10
-    );
-    doc.text(
-      `Page ${i} of ${pageCount}`,
-      doc.internal.pageSize.width - 40,
-      doc.internal.pageSize.height - 10
-    );
+    const pageHeight = doc.internal.pageSize.height;
+    
+    // Footer line
+    doc.setDrawColor(...COLORS.gray200);
+    doc.line(20, pageHeight - 15, pageWidth - 20, pageHeight - 15);
+    
+    // Footer text
+    doc.setFontSize(8);
+    doc.setTextColor(...COLORS.gray500);
+    doc.text('Syllabus Slayer', 20, pageHeight - 8);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - 20, pageHeight - 8, { align: 'right' });
   }
   
   // ====== DOWNLOAD ======
-  const filename = `study-plan-${data.playlistTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`;
+  const filename = `study-plan-${data.playlistTitle.replace(/[^a-z0-9]/gi, '-').substring(0, 30).toLowerCase()}.pdf`;
   doc.save(filename);
 }

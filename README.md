@@ -276,15 +276,18 @@ See [SETUP.md](./SETUP.md) for detailed installation instructions including Supa
 
 ## 📚 Documentation
 
-- **[ROADMAP.md](./ROADMAP.md)** - Development phases and timelines
-- **[TECH_STACK.md](./TECH_STACK.md)** - Complete technology choices
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Full system architecture (Phases 1–3D+)
-- **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)** - Complete file tree
-- **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** - Project structure and setup
-- **[PHASE_2_IMPLEMENTATION.md](./PHASE_2_IMPLEMENTATION.md)** - Phase 2 technical details
-- **[PHASE3_COMPLETE.md](./PHASE3_COMPLETE.md)** - Phase 3 (A–D) summary
-- **[SETUP.md](./SETUP.md)** - Installation, Supabase, and OAuth guide
-- **[QUICK_START.md](./QUICK_START.md)** - Quick-start guide
+All documentation is located in the `documents/` folder:
+
+- **[ROADMAP.md](./documents/ROADMAP.md)** - Development phases and timelines
+- **[TECH_STACK.md](./documents/TECH_STACK.md)** - Complete technology choices
+- **[ARCHITECTURE.md](./documents/ARCHITECTURE.md)** - Full system architecture
+- **[PROJECT_STRUCTURE.md](./documents/PROJECT_STRUCTURE.md)** - Complete file tree
+- **[SETUP.md](./documents/SETUP.md)** - Installation, Supabase, and OAuth guide
+- **[QUICK_START.md](./documents/QUICK_START.md)** - Quick-start guide
+- **[API_CONTRACT.md](./documents/API_CONTRACT.md)** - Backend API specification
+- **[CHANGELOG.md](./documents/CHANGELOG.md)** - Version history
+- **[PHASE_2_IMPLEMENTATION.md](./documents/PHASE_2_IMPLEMENTATION.md)** - Phase 2 details
+- **[PHASE_3.md](./documents/PHASE_3.md)** - Phase 3 (A–D) complete summary
 
 ---
 

@@ -5,33 +5,29 @@
 ```
 SyllabusSlayer/
 │
-├── 📄 README.md
-├── 📄 ROADMAP.md
-├── 📄 TECH_STACK.md
-├── 📄 IMPLEMENTATION.md
-├── 📄 ARCHITECTURE.md                    ← Updated through Phase 3D+
-├── 📄 SETUP.md
-├── 📄 API_CONTRACT.md
-├── 📄 CHANGELOG.md
-├── 📄 PHASE3_COMPLETE.md                 ← Full Phase 3 summary
-├── 📄 PHASE_2_IMPLEMENTATION.md
-├── 📄 PHASE_3A_CHECKLIST.md
-├── 📄 PHASE_3A_COMPLETE.md
-├── 📄 PHASE_3A_README.md
-├── 📄 PHASE_3A_SUMMARY.md
-├── 📄 PHASE_3B_SUMMARY.md
-├── 📄 PHASE_3C_COMPLETE.md
-├── 📄 PHASE_3D_PROMPT.md
-├── 📄 components.json                    ← Shadcn/UI + Aceternity registry config
-├── 📄 package.json                       ← npm workspaces root
-├── 📄 setup-phase3a.sh
+├── 📄 README.md                           ← Main project documentation
+├── 📄 package.json                        ← npm workspaces root
+├── 📄 setup-phase3a.sh                    ← Setup script
+│
+├── 📂 documents/                          ← All documentation
+│   ├── 📄 ROADMAP.md
+│   ├── 📄 TECH_STACK.md
+│   ├── 📄 ARCHITECTURE.md
+│   ├── 📄 PROJECT_STRUCTURE.md
+│   ├── 📄 SETUP.md
+│   ├── 📄 QUICK_START.md
+│   ├── 📄 API_CONTRACT.md
+│   ├── 📄 CHANGELOG.md
+│   ├── 📄 IMPLEMENTATION.md
+│   ├── 📄 PHASE_2_IMPLEMENTATION.md
+│   └── 📄 PHASE_3.md                      ← Full Phase 3 (A-D) summary
 │
 ├── 📂 supabase/
-│   ├── 📄 schema.sql                     ← Full DB schema (Phase 3A)
+│   ├── 📄 schema.sql                      ← Full DB schema (Phase 3A)
 │   ├── 📄 fix-nextauth.sql
 │   ├── 📄 disable-rls-temp.sql
 │   └── 📂 migrations/
-│       └── 📄 phase3c-gamification.sql   ← Leaderboard + materialized view
+│       └── 📄 phase3c-gamification.sql    ← Leaderboard + materialized view
 │
 ├── 📂 backend/                           ← Node.js + Express API
 │   ├── 📄 package.json

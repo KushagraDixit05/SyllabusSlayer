@@ -287,5 +287,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **For more details, see:**
 - [ROADMAP.md](./ROADMAP.md) - Future development plans
-- [PHASE_2_IMPLEMENTATION.md](./PHASE_2_IMPLEMENTATION.md) - Technical implementation details
+- [PHASE_2_IMPLEMENTATION.md](./PHASE_2_IMPLEMENTATION.md) - Phase 2 details
+- [PHASE_3.md](./PHASE_3.md) - Phase 3 details
 - [TECH_STACK.md](./TECH_STACK.md) - Technology choices and rationale
