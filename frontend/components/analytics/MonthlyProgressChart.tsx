@@ -51,7 +51,8 @@ export function MonthlyProgressChart({ data }: MonthlyProgressChartProps) {
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
               labelFormatter={(label) => {
-                const [year, month] = label.split('-')
+                const [year, month] = String(label ?? '').split('-')
+                if (!year || !month) return label
                 const date = new Date(parseInt(year), parseInt(month) - 1)
                 return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
               }}
