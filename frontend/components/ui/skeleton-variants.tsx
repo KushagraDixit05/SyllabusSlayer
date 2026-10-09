@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function PlaylistCardSkeleton() {
   return (
-    <div className="rounded-lg border p-4 space-y-3">
+    <div className="brutal-border shadow-brutal-sm p-4 space-y-3">
       <Skeleton className="h-32 w-full" />
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
@@ -16,7 +16,7 @@ export function PlaylistCardSkeleton() {
 
 export function StatsCardSkeleton() {
   return (
-    <div className="rounded-lg border p-6 space-y-2">
+    <div className="brutal-border shadow-brutal-sm p-6 space-y-2">
       <Skeleton className="h-4 w-24" />
       <Skeleton className="h-8 w-32" />
       <Skeleton className="h-3 w-full" />

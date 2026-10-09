@@ -27,7 +27,7 @@ export function SpeedSelector() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+          <Zap className="h-5 w-5 text-foreground" />
           Playback Speed
         </CardTitle>
         <CardDescription>
@@ -54,8 +54,8 @@ export function SpeedSelector() {
         {/* Custom Speed Slider */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Custom Speed</span>
-            <span className="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-xs font-bold">Custom Speed</span>
+            <span className="font-display text-2xl font-black tabular-nums">
               {customSpeed.toFixed(2)}x
             </span>
           </div>
@@ -67,7 +67,7 @@ export function SpeedSelector() {
             step={0.05}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-sm font-medium text-muted-foreground">
             <span>0.25x (Slower)</span>
             <span>3.0x (Faster)</span>
           </div>

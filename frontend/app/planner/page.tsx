@@ -12,17 +12,18 @@ import { SpeedSelector } from '@/components/speed/SpeedSelector';
 import { SpeedComparisonTable } from '@/components/speed/SpeedComparisonTable';
 import { ExportMenu } from '@/components/export/ExportMenu';
 import { ManualEntrySection } from '@/components/manual/ManualEntrySection';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { PlaylistForm } from '@/components/PlaylistForm';
 import { LoadingState } from '@/components/LoadingState';
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { usePlaylist } from '@/hooks/usePlaylist';
 import { useUIStore } from '@/store/useUIStore';
-import { Calendar, Zap, FileText, Plus, BookmarkPlus, Loader2, ArrowLeft, Video, Clock, BarChart3, LogIn, ArrowRight, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Calendar, Zap, List, Plus, BookmarkPlus, Loader2, ArrowLeft, Video, Clock, BarChart3, LogIn, ArrowRight, ChevronDown, ChevronUp, Filter, PlaySquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { BackgroundBeams } from '@/components/ui/background-beams';
-import { AnimatedWaveBackground } from '@/components/ui/animated-wave-background';
+import { Logo } from '@/components/brand/Logo';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 // Speed options for public view
 const SPEED_OPTIONS = [
@@ -190,45 +191,48 @@ export default function PlannerPage() {
 
   if (!hasVideos && showEmptyState) {
     return (
-      <div className="min-h-screen bg-black relative">
-        <AnimatedWaveBackground />
-        
+      <div className="brutal-dots relative flex min-h-screen flex-col bg-background">
         {/* Navigation header */}
-        <div className="fixed top-0 inset-x-0 flex items-center justify-between p-4 z-20">
-          <Link
-            href={isAuthenticated ? "/dashboard" : "/"}
-            className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors glass px-3 py-1.5 rounded-lg border border-white/10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
+        <div className="relative z-20 flex shrink-0 items-center justify-between p-4">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <Logo size={36} className="rounded-xl" />
+            <span className="font-display text-lg font-black tracking-tight text-foreground md:text-xl">
+              Syllabus<span className="text-gradient-brand">Slayer</span>
+            </span>
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <Link
+              href={isAuthenticated ? "/dashboard" : "/"}
+              className="rounded-full flex items-center gap-2 border-[3px] border-ink bg-card px-4 py-2 text-sm font-bold transition-colors hover:bg-accent"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
+            </Link>
+          </div>
         </div>
 
         {/* Centered analyzer card */}
-        <div className="fixed inset-0 flex items-center justify-center p-4 z-10 pt-20">
-          <div className="w-full max-w-lg">
+        <div className="relative z-10 flex flex-1 items-center justify-center p-4">
+          <div className="w-full max-w-3xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="relative card-border overflow-hidden rounded-2xl flex flex-col"
+              className="rounded-lg relative flex flex-col border-[3px] border-ink bg-card shadow-brutal-lg"
             >
-              <div className="bg-black/80 backdrop-blur-sm rounded-2xl">
+              <div>
                 {/* Header */}
                 <div className="p-6 pb-4">
-                  <span className="inline-block px-3 py-1 glass text-indigo-300 rounded-full text-xs font-medium mb-3 border border-indigo-400/30">
-                    Analyze Playlist
-                  </span>
-                  <h3 className="text-xl font-medium text-white mb-2">
+                  <Badge className="mb-3">Analyze Playlist</Badge>
+                  <h3 className="mb-2 font-display text-xl font-black leading-none tracking-tight">
                     Paste a YouTube Playlist
                   </h3>
-                  <p className="text-white/60 leading-relaxed text-sm">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     Enter a playlist URL or ID to analyze duration, plan sessions, and track progress.
                   </p>
                 </div>
 
                 {/* Divider */}
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="w-full border-t-[3px] border-ink" />
 
                 {/* Form area */}
                 <div className="p-6">
@@ -256,48 +260,49 @@ export default function PlannerPage() {
                       className="mt-6 space-y-4"
                     >
                       {/* Playlist info */}
-                      <div className="p-4 rounded-xl glass border border-white/10">
-                        <h4 className="text-white font-medium mb-3 truncate">{playlistData.title}</h4>
+                      <div className="rounded-lg border-[3px] border-ink bg-muted p-4">
+                        <h4 className="mb-3 flex items-center gap-2 truncate font-display text-base font-black tracking-tight">
+                          <PlaySquare className="h-4 w-4 shrink-0 text-foreground" />
+                          {playlistData.title}
+                        </h4>
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="text-center">
-                            <Video className="h-4 w-4 text-indigo-400 mx-auto mb-1" />
-                            <p className="text-white font-semibold text-sm">{playlistData.videoCount}</p>
-                            <p className="text-white/50 text-xs">Videos</p>
-                          </div>
-                          <div className="text-center">
-                            <Clock className="h-4 w-4 text-indigo-400 mx-auto mb-1" />
-                            <p className="text-white font-semibold text-sm">{playlistData.totalDurationFormatted}</p>
-                            <p className="text-white/50 text-xs">Duration</p>
-                          </div>
-                          <div className="text-center">
-                            <BarChart3 className="h-4 w-4 text-indigo-400 mx-auto mb-1" />
-                            <p className="text-white font-semibold text-sm">{playlistData.averageVideoLengthFormatted}</p>
-                            <p className="text-white/50 text-xs">Avg Length</p>
-                          </div>
+                          {[
+                            { icon: Video, value: playlistData.videoCount, label: 'Videos' },
+                            { icon: Clock, value: playlistData.totalDurationFormatted, label: 'Duration' },
+                            { icon: BarChart3, value: playlistData.averageVideoLengthFormatted, label: 'Avg Length' },
+                          ].map(({ icon: Icon, value, label }) => (
+                            <div key={label} className="text-center">
+                              <div className="rounded-full mx-auto mb-1.5 flex h-8 w-8 items-center justify-center border-[3px] border-ink bg-primary text-primary-foreground">
+                                <Icon className="h-4 w-4" />
+                              </div>
+                              <p className="font-display text-sm font-black tabular-nums">{value}</p>
+                              <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                       
                       {/* Video Range Selector (Collapsible) */}
-                      <div className="rounded-xl glass border border-white/10 overflow-hidden">
+                      <div className="rounded-lg overflow-hidden border-[3px] border-ink bg-muted">
                         <button
                           onClick={() => setShowRangeSelector(!showRangeSelector)}
-                          className="w-full p-3 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                          className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-accent"
                         >
                           <div className="flex items-center gap-2">
-                            <Filter className="h-4 w-4 text-indigo-400" />
-                            <span className="text-white/80 text-sm font-medium">
+                            <Filter className="h-4 w-4 text-foreground" />
+                            <span className="text-xs font-bold">
                               Custom Video Range
                             </span>
                             {selectedRangeData && !selectedRangeData.isFullPlaylist && (
-                              <span className="text-xs text-indigo-400 bg-indigo-400/10 px-2 py-0.5 rounded-full">
+                              <span className="rounded-full border-[3px] border-ink bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
                                 {selectedRangeData.count} videos selected
                               </span>
                             )}
                           </div>
                           {showRangeSelector ? (
-                            <ChevronUp className="h-4 w-4 text-white/40" />
+                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
                           ) : (
-                            <ChevronDown className="h-4 w-4 text-white/40" />
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
                           )}
                         </button>
                         
@@ -311,13 +316,13 @@ export default function PlannerPage() {
                               className="overflow-hidden"
                             >
                               <div className="p-4 pt-0 space-y-3">
-                                <p className="text-white/50 text-xs">
+                                <p className="text-sm font-medium text-muted-foreground">
                                   Select a range to calculate duration for specific videos only
                                 </p>
                                 
                                 <div className="flex items-center gap-3">
                                   <div className="flex-1">
-                                    <label className="text-white/60 text-xs mb-1 block">From video</label>
+                                    <label className="mb-1 block text-xs font-bold text-muted-foreground">From video</label>
                                     <input
                                       type="number"
                                       min={1}
@@ -328,12 +333,12 @@ export default function PlannerPage() {
                                         const maxVal = rangeEnd ?? playlistData.videoCount;
                                         setRangeStart(Math.min(val, maxVal));
                                       }}
-                                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                      className="rounded-lg w-full border-[3px] border-ink bg-background px-3 py-2 font-mono text-sm tabular-nums focus:outline-none focus-visible:bg-accent"
                                     />
                                   </div>
-                                  <span className="text-white/40 mt-5">to</span>
+                                  <span className="mt-5 text-xs font-medium text-muted-foreground">to</span>
                                   <div className="flex-1">
-                                    <label className="text-white/60 text-xs mb-1 block">To video</label>
+                                    <label className="mb-1 block text-xs font-bold text-muted-foreground">To video</label>
                                     <input
                                       type="number"
                                       min={rangeStart}
@@ -343,23 +348,23 @@ export default function PlannerPage() {
                                         const val = Math.min(playlistData.videoCount, parseInt(e.target.value) || playlistData.videoCount);
                                         setRangeEnd(Math.max(val, rangeStart));
                                       }}
-                                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500"
+                                      className="rounded-lg w-full border-[3px] border-ink bg-background px-3 py-2 font-mono text-sm tabular-nums focus:outline-none focus-visible:bg-accent"
                                     />
                                   </div>
                                 </div>
                                 
                                 {/* Selected range summary */}
                                 {selectedRangeData && (
-                                  <div className={`p-3 rounded-lg ${selectedRangeData.isFullPlaylist ? 'bg-white/5' : 'bg-indigo-500/10 border border-indigo-400/20'}`}>
+                                  <div className={cn('border-[3px] p-3', selectedRangeData.isFullPlaylist ? 'border-transparent bg-accent' : 'border-ink bg-accent')}>
                                     <div className="flex items-center justify-between">
-                                      <span className="text-white/70 text-sm">
+                                      <span className="text-sm font-medium text-muted-foreground">
                                         {selectedRangeData.isFullPlaylist ? (
                                           'Full playlist selected'
                                         ) : (
                                           <>Videos {selectedRangeData.start} – {selectedRangeData.end}</>
                                         )}
                                       </span>
-                                      <span className="text-white font-medium text-sm">
+                                      <span className="font-display text-sm font-black tabular-nums">
                                         {selectedRangeData.count} videos • {formatDuration(selectedRangeData.duration)}
                                       </span>
                                     </div>
@@ -373,7 +378,7 @@ export default function PlannerPage() {
                                       setRangeStart(1);
                                       setRangeEnd(null);
                                     }}
-                                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                                    className="text-xs font-bold underline underline-offset-4 transition-colors hover:text-muted-foreground"
                                   >
                                     Reset to full playlist
                                   </button>
@@ -385,48 +390,58 @@ export default function PlannerPage() {
                       </div>
                       
                       {/* Speed options table (PUBLIC FEATURE) */}
-                      <div className="p-4 rounded-xl glass border border-white/10">
-                        <h4 className="text-white/80 text-sm font-medium mb-3 flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-indigo-400" />
+                      <div className="rounded-lg border-[3px] border-ink bg-muted p-4">
+                        <h4 className="mb-3 flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                          <Zap className="h-4 w-4 text-foreground" />
                           Duration at Different Speeds
                           {selectedRangeData && !selectedRangeData.isFullPlaylist && (
-                            <span className="text-xs text-indigo-400/70 font-normal">
+                            <span className="font-mono text-xs font-normal text-muted-foreground">
                               (for selected {selectedRangeData.count} videos)
                             </span>
                           )}
                         </h4>
                         <div className="grid grid-cols-5 gap-2">
-                          {SPEED_OPTIONS.map(({ speed, label }) => (
-                            <div key={speed} className="text-center p-2 rounded-lg bg-white/5">
-                              <p className="text-indigo-400 text-xs font-medium">{label}</p>
-                              <p className="text-white font-semibold text-sm mt-1">
-                                {formatDuration(effectiveDuration / speed)}
-                              </p>
-                            </div>
-                          ))}
+                          {SPEED_OPTIONS.map(({ speed, label }) => {
+                            const isSweetSpot = speed === 1.5;
+                            return (
+                              <div
+                                key={speed}
+                                className={cn(
+                                  'border-[3px] p-2 text-center transition-colors',
+                                  isSweetSpot
+                                    ? 'border-ink bg-primary text-primary-foreground'
+                                    : 'border-transparent bg-accent'
+                                )}
+                              >
+                                <p className="text-xs font-bold">{label}</p>
+                                <p className="mt-1 font-display text-sm font-black tabular-nums">
+                                  {formatDuration(effectiveDuration / speed)}
+                                </p>
+                                {isSweetSpot && (
+                                  <p className="mt-0.5 text-[9px] font-bold">
+                                    Sweet Spot
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                       
                       {/* CTA: Sign in to Plan or Start Planning */}
                       <div className="space-y-3">
                         {isAuthenticated ? (
-                          <button
-                            onClick={handleStartPlanning}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-colors"
-                          >
+                          <Button onClick={handleStartPlanning} size="lg" className="w-full gap-2">
                             Start Planning
                             <ArrowRight className="h-4 w-4" />
-                          </button>
+                          </Button>
                         ) : (
                           <>
-                            <button
-                              onClick={() => signIn()}
-                              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-colors"
-                            >
+                            <Button onClick={() => signIn()} size="lg" className="w-full gap-2">
                               <LogIn className="h-4 w-4" />
                               Sign in to Plan Sessions
-                            </button>
-                            <p className="text-center text-white/40 text-xs">
+                            </Button>
+                            <p className="text-center text-sm font-medium text-muted-foreground">
                               Sign in to access partitions, scheduling, and save to dashboard
                             </p>
                           </>
@@ -437,19 +452,19 @@ export default function PlannerPage() {
                 </div>
 
                 {/* Divider */}
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
 
                 {/* Footer actions */}
                 <div className="p-4 flex items-center justify-between">
                   <button
                     onClick={handleAddManually}
-                    className="text-white/60 hover:text-white transition flex items-center text-xs font-medium gap-2"
+                    className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition hover:text-foreground"
                   >
                     <Plus className="h-4 w-4" />
                     Add videos manually
-                    {!isAuthenticated && <LogIn className="h-3 w-3 ml-1 text-indigo-400" />}
+                    {!isAuthenticated && <LogIn className="ml-1 h-3 w-3 text-foreground" />}
                   </button>
-                  <span className="text-white/40 text-xs glass px-2 py-1 rounded-full border border-white/10">
+                  <span className="rounded-lg border-[3px] border-ink bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
                     {playlistData ? 'Analyze • Free' : 'Free • No sign-in'}
                   </span>
                 </div>
@@ -457,39 +472,46 @@ export default function PlannerPage() {
             </motion.div>
           </div>
         </div>
+
+        {/* Page footer */}
+        <div className="relative z-10 shrink-0 py-4 text-center text-sm font-medium text-muted-foreground">
+          © {new Date().getFullYear()} SyllabusSlayer. Slay Your Syllabus. One Playlist at a Time.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <BackgroundBeams />
+    <div className="brutal-dots relative min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="sticky top-0 z-30 border-b-[3px] border-ink bg-background">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Link href="/dashboard" className="hidden sm:flex shrink-0" title="SyllabusSlayer">
+                <Logo size={28} />
+              </Link>
+              <div className="hidden sm:block h-6 w-px bg-border" />
               <Link
                 href="/dashboard"
-                className="flex items-center justify-center h-9 w-9 rounded-lg border border-border hover:bg-accent transition-colors"
+                className="rounded-full flex h-9 w-9 items-center justify-center border-[3px] border-ink transition-colors hover:bg-accent"
                 title="Back to Dashboard"
               >
                 <ArrowLeft className="h-4 w-4 text-muted-foreground" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{playlistTitle || 'Untitled Playlist'}</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="font-display text-2xl font-black leading-none tracking-tight text-foreground">{playlistTitle || 'Untitled Playlist'}</h1>
+                <p className="text-sm font-medium text-muted-foreground">
                   {videos.length} videos • {Math.floor(totalDuration / 60)} minutes total
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               <ExportMenu />
-              <button
+              <Button
                 onClick={handleSaveToDashboard}
                 disabled={isSaving || !hasVideos}
-                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="gap-2"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -497,18 +519,18 @@ export default function PlannerPage() {
                   <BookmarkPlus className="h-4 w-4" />
                 )}
                 {isSaving ? 'Saving...' : 'Save to Dashboard'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Tab Navigation */}
-      <div className="border-b bg-background">
+      <div className="border-b-[3px] border-ink bg-background">
         <div className="container mx-auto px-4">
           <nav className="flex gap-1">
             {[
-              { id: 'partition', label: 'Partitions', icon: FileText },
+              { id: 'partition', label: 'Partitions', icon: List },
               { id: 'schedule', label: 'Schedule', icon: Calendar },
               { id: 'speed', label: 'Speed', icon: Zap },
               { id: 'manual', label: 'Manual Entry', icon: Plus },
@@ -553,7 +575,7 @@ export default function PlannerPage() {
           transition={{ duration: 0.3 }}
         >
           {activeTab === 'partition' && (
-            <div className="space-y-8">
+            <div className="grid gap-6 lg:grid-cols-[380px_1fr] items-start">
               <PartitionControls />
               {hasPartitions && <PartitionList />}
             </div>

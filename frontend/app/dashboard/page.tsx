@@ -7,6 +7,8 @@ import { ActivePlaylists } from '@/components/dashboard/ActivePlaylists'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { RecentActivity } from '@/components/dashboard/RecentActivity'
 import { ProgressOverview } from '@/components/dashboard/ProgressOverview'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { activityRepository } from '@/lib/repositories/activityRepository'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -20,28 +22,32 @@ export default async function DashboardPage() {
     image: session!.user.image,
   })
   
-  const [playlists, userProfile, allPlaylists] = await Promise.all([
+  const [playlists, userProfile, allPlaylists, activityData] = await Promise.all([
     playlistRepository.getActivePlaylistsByUserId(userId),
     userRepository.getProfile(userId),
     playlistRepository.getByUserId(userId),
+    activityRepository.getDailyActivityCounts(userId),
   ])
 
   const completedPlaylists = allPlaylists.filter((p) => p.status === 'completed').length
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {userProfile?.display_name || session?.user?.name}!
-          </p>
-        </div>
-        <QuickActions />
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Tactical Cockpit"
+        title={
+          <>
+            Welcome back,{' '}
+            <span className="text-gradient-brand">
+              {userProfile?.display_name || session?.user?.name}
+            </span>
+          </>
+        }
+        actions={<QuickActions />}
+      />
 
-      <DashboardStats userId={userId} userProfile={userProfile} />
-      
+      <DashboardStats userId={userId} userProfile={userProfile} activePlaylistsCount={playlists.length} />
+
       <div className="grid gap-6 md:grid-cols-2">
         <ActivePlaylists playlists={playlists} />
         <RecentActivity userId={userId} />
@@ -53,7 +59,8 @@ export default async function DashboardPage() {
         totalPlaylists={allPlaylists.length}
         currentStreak={userProfile?.current_streak ?? 0}
         longestStreak={userProfile?.longest_streak ?? 0}
-        activityData={[]}
+        activityData={activityData}
+        xp={userProfile?.xp ?? 0}
       />
     </div>
   )

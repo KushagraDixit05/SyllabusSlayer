@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,11 @@ import { Share2 } from 'lucide-react'
 import type { AchievementDefinition } from '@/lib/achievements/definitions'
 import Confetti from 'react-confetti'
 import { useWindowSize } from '@/hooks/useWindowSize'
+import {
+  getConfettiColors,
+  CONFETTI_PIECES,
+  CONFETTI_GRAVITY,
+} from '@/lib/celebrations/confettiColors'
 
 interface AchievementUnlockedModalProps {
   achievement: AchievementDefinition | null
@@ -27,6 +32,7 @@ export function AchievementUnlockedModal({
   onShare,
 }: AchievementUnlockedModalProps) {
   const { width, height } = useWindowSize()
+  const reduceMotion = useReducedMotion()
 
   if (!achievement) return null
 
@@ -34,13 +40,14 @@ export function AchievementUnlockedModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <AnimatePresence>
-          {open && (
+          {open && !reduceMotion && (
             <Confetti
               width={width}
               height={height}
               recycle={false}
-              numberOfPieces={200}
-              gravity={0.3}
+              numberOfPieces={CONFETTI_PIECES}
+              gravity={CONFETTI_GRAVITY}
+              colors={getConfettiColors()}
             />
           )}
         </AnimatePresence>
@@ -57,14 +64,14 @@ export function AchievementUnlockedModal({
         >
           <div className="text-8xl">{achievement.icon}</div>
 
-          <h2 className="text-2xl font-bold text-center">{achievement.name}</h2>
+          <h2 className="text-center font-display text-2xl font-black tracking-tight">{achievement.name}</h2>
 
           <p className="text-center text-muted-foreground">
             {achievement.description}
           </p>
 
           <div className="flex items-center space-x-2">
-            <span className="text-3xl font-bold text-primary">
+            <span className="font-display text-3xl font-black tabular-nums">
               +{achievement.points}
             </span>
             <span className="text-muted-foreground">points</span>

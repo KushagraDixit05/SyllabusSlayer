@@ -7,7 +7,7 @@ import { LandingFooter } from '@/components/landing/LandingFooter';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white dark:bg-neutral-950 text-gray-900 dark:text-white overflow-x-hidden">
+    <main className="brutal-dots min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Hero */}
       <HeroSection />
 

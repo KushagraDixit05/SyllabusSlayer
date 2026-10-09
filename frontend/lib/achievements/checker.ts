@@ -28,6 +28,7 @@ export class AchievementChecker {
         )
         if (unlocked) {
           newAchievements.push(achievement)
+          await userRepository.addXp(userId, achievement.points)
         }
       }
     }
@@ -52,15 +53,13 @@ export class AchievementChecker {
         return ((profile.total_hours_planned as number) || 0) >= threshold
 
       case 'hours_saved':
-        // TODO: Implement based on actual speed-adjusted data
-        return false
+        return ((profile.total_hours_saved as number) || 0) >= threshold
 
       case 'streak_days':
         return ((profile.current_streak as number) || 0) >= threshold
 
       case 'speed_mastery':
-        // TODO: Requires playlist-level speed tracking
-        return false
+        return ((profile.speed_mastery_count as number) || 0) >= threshold
 
       default:
         return false

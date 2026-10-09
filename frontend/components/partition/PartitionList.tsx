@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, PlayCircle, CheckCircle2 } from 'lucide-react';
+import { Clock, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function PartitionList() {
@@ -31,8 +31,11 @@ export function PartitionList() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Your Study Sessions</CardTitle>
+        <span className="text-xs font-bold text-muted-foreground">
+          Auto-Partitioned
+        </span>
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full">
@@ -46,16 +49,16 @@ export function PartitionList() {
               <AccordionItem value={partition.id}>
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold">
+                    <div className="rounded-full flex h-10 w-10 shrink-0 items-center justify-center border-[3px] border-ink bg-primary font-display font-black text-primary-foreground">
                       {index + 1}
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="font-semibold">Session {index + 1}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-display text-base font-black tracking-tight">Session {index + 1}</p>
+                      <p className="text-sm font-medium text-muted-foreground">
                         {partition.videos.length} videos • {formatDuration(partition.duration)}
                       </p>
                     </div>
-                    <Badge variant="outline" className="hidden md:flex">
+                    <Badge className="hidden md:flex">
                       <Clock className="h-3 w-3 mr-1" />
                       {formatDuration(partition.duration)}
                     </Badge>
@@ -69,22 +72,22 @@ export function PartitionList() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: videoIndex * 0.05 }}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                        className="flex items-start gap-3 p-3 transition-colors hover:bg-accent"
                       >
-                        <PlayCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <PlayCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-foreground" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{video.title}</p>
-                          <p className="text-xs text-muted-foreground">{formatDuration(video.duration)}</p>
+                          <p className="truncate text-sm font-medium">{video.title}</p>
+                          <p className="font-mono text-xs text-muted-foreground">{formatDuration(video.duration)}</p>
                         </div>
                       </motion.div>
                     ))}
                     
                     {partition.breakAfter && partition.breakAfter > 0 && (
-                      <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 mt-4">
-                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <div className="rounded-lg mt-4 flex items-center gap-3 border-[3px] border-ink bg-flame-from p-3 text-primary-foreground">
+                        <Clock className="h-5 w-5 flex-shrink-0" />
                         <div className="flex-1">
-                          <p className="font-medium text-sm text-green-900 dark:text-green-100">Break Time</p>
-                          <p className="text-xs text-green-700 dark:text-green-300">
+                          <p className="font-display text-sm font-black tracking-wide">Break Time</p>
+                          <p className="font-mono text-xs">
                             Take a {partition.breakAfter} minute break before the next session
                           </p>
                         </div>

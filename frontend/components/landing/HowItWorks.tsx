@@ -10,7 +10,7 @@ const steps = [
     title: "Paste a YouTube Playlist URL",
     description:
       "Copy any YouTube playlist link — a full university course, a coding bootcamp, a language series, anything. Paste it into the analyser below.",
-    color: "from-blue-600 to-cyan-500",
+    gradient: "bg-primary",
   },
   {
     step: "02",
@@ -18,7 +18,7 @@ const steps = [
     title: "Configure Your Study Plan",
     description:
       "Choose your daily time budget, target playback speed, and how you want to partition the content. We'll build a schedule around your life.",
-    color: "from-purple-600 to-pink-500",
+    gradient: "bg-flame-from",
   },
   {
     step: "03",
@@ -26,7 +26,7 @@ const steps = [
     title: "Track, Achieve, Repeat",
     description:
       "Save your plan to the dashboard. Check off sessions, maintain your streak, unlock achievements, and race up the leaderboard.",
-    color: "from-emerald-500 to-teal-500",
+    gradient: "bg-rarity-epic",
   },
 ];
 
@@ -35,7 +35,6 @@ export function HowItWorks() {
     <section className="relative mx-auto max-w-7xl px-4 py-24">
       {/* Background accent */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-purple-100/40 dark:bg-purple-900/10 blur-3xl" />
       </div>
 
       {/* Header */}
@@ -44,7 +43,7 @@ export function HowItWorks() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="inline-block rounded-full bg-purple-50 dark:bg-purple-950 px-4 py-1.5 text-sm font-semibold text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-900 mb-4"
+          className="inline-block rounded-full border-[3px] border-ink bg-primary px-4 py-1.5 text-sm font-bold text-primary-foreground mb-4"
         >
           How it works
         </motion.span>
@@ -53,7 +52,7 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+          className="font-display text-3xl font-black tracking-tight text-foreground sm:text-4xl"
         >
           Three steps to slaying your syllabus
         </motion.h2>
@@ -62,7 +61,7 @@ export function HowItWorks() {
       {/* Steps */}
       <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
         {/* Connecting line (desktop) */}
-        <div className="absolute inset-x-0 top-14 hidden h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent md:block" />
+        <div className="absolute inset-x-0 top-14 hidden h-[3px] rounded-full bg-ink/15 md:block" />
 
         {steps.map((step, i) => {
           const Icon = step.icon;
@@ -77,20 +76,20 @@ export function HowItWorks() {
             >
               {/* Step icon */}
               <div
-                className={`relative z-10 mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} shadow-lg`}
+                className={`relative z-10 mb-6 flex h-16 w-16 items-center justify-center rounded-lg border-[3px] border-ink ${step.gradient} shadow-brutal-sm`}
               >
-                <Icon className="h-7 w-7 text-white" />
+                <Icon className="h-7 w-7 text-primary-foreground" />
               </div>
 
               {/* Step number badge */}
-              <span className="absolute -right-2 top-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-bold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+              <span className="absolute -right-2 top-0 z-10 flex h-6 w-6 items-center justify-center rounded-full border-[3px] border-ink bg-card text-xs font-bold text-foreground">
                 {step.step}
               </span>
 
-              <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
+              <h3 className="mb-3 text-xl font-bold text-foreground">
                 {step.title}
               </h3>
-              <p className="max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+              <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
             </motion.div>

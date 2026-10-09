@@ -1,316 +1,61 @@
-# Syllabus Slayer: YouTube Time Architect
+# SyllabusSlayer — YouTube Time Architect
 
-> **Transform content consumption chaos into calculated mastery.**
+Turn a YouTube playlist into a study plan: see how long it really takes, split it into sessions, schedule it around your week, tune playback speed, and track progress with streaks, XP, achievements and analytics.
 
-A premium time-planning system designed for the modern learner who treats knowledge acquisition as a strategic discipline. Not just another duration calculator—this is your personal learning operations command center.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com/)
+[![Express](https://img.shields.io/badge/Express-4-black?logo=express)](https://expressjs.com/)
+[![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-**Current Status:** Phase 3D+ Complete ✅ | Active Development | Next.js 14 + TypeScript + Supabase
+**Who it is for:** students facing a lecture playlist before an exam, professionals fitting a long course around work, certification candidates, and anyone with a Watch Later queue that never shrinks.
 
----
+## Features
 
-## 🎯 Project Vision
+- **Playlist analysis** — paste a playlist URL or ID; get video count, total and average duration, and duration at 1×, 1.25×, 1.5×, 1.75× and 2× (YouTube Data API v3).
+- **Planner** (`/planner`, works signed-out) — partition into sessions of a chosen length, compute a finish date from daily hours / rest days / weekday-weekend hours, compare speeds (including custom 0.25–3×), add manual videos in many time formats, export PDF / CSV, or share a link.
+- **Dashboard** (Google sign-in) — saved playlists with filter, search and view modes; ⌘K command palette; dark mode; onboarding tour.
+- **Gamification** — streaks and activity heatmap, XP and levels, 12 achievements with celebration modals, opt-in leaderboard.
+- **Analytics** — average study time, most productive day, speed distribution, completion rate, monthly progress.
 
-In an era where educational content sprawls across hours of YouTube playlists, learners face a critical planning problem: **uncertainty breeds procrastination**. Syllabus Slayer eliminates the guesswork from learning timelines, transforming overwhelming content libraries into structured, achievable learning sprints.
+## Architecture at a glance
 
-We're building the world's first **YouTube Time Architecture Platform**—where students, professionals, and lifelong learners design their learning schedules with precision, partition massive playlists into digestible sessions, and track their journey from intimidation to completion.
-
-**Our Mission:** Empower learners to take control of their time, turning daunting educational marathons into planned, executable learning experiences.
-
----
-
-## 🔍 Market Gap & Competitive Analysis
-
-### The Current Landscape
-
-The existing solutions for YouTube playlist duration calculation suffer from three critical failures:
-
-1. **Passive Calculation Philosophy**  
-   Current tools treat themselves as simple arithmetic machines. They answer "How long is this?" but ignore the real question: "How do I actually watch this?"
-
-2. **Design Neglect**  
-   Most competitors operate with 2010-era interfaces—cluttered layouts, confusing controls, and zero attention to modern UX principles. They feel like utilities, not products.
-
-3. **Missing Strategic Layer**  
-   No existing tool bridges the gap between "playlist duration" and "learning plan." Users get a number (e.g., "18 hours 42 minutes") but no actionable next steps—no scheduling logic, no partitioning, no progress framework.
-
-### Our Differentiators
-
-**1. Time Architecture, Not Calculation**  
-We don't just tell you "20 hours"—we help you architect that time. Break it into 4-hour study blocks, adjust for 1.5x playback, schedule across your available hours per day, and visualize exactly when you'll finish.
-
-**2. Premium User Experience**  
-Every interaction is designed with intention. Smooth animations, intelligent defaults, responsive feedback, and a visual language that says "professional tool" rather than "hobby project."
-
-**3. Intelligence Layer**  
-- **Smart Partitioning:** Automatically suggest logical breakpoints (e.g., "Complete Module 1 in Session A")
-- **Speed Optimization:** Calculate realistic time savings at various playback speeds
-- **Scheduling Engine:** Input "I have 2 hours per day"—get a completion timeline
-- **Progress Tracking:** Turn completion into achievement with visual feedback and history
-
-**4. Ecosystem Thinking**  
-From browser extension for instant access to cloud sync for cross-device continuity, we're building a platform, not a page.
-
----
-
-## ✨ Key Features
-
-### Core Functionality
-
-#### **YouTube Playlist Analysis**
-- Instant duration calculation via YouTube Data API
-- Support for public playlists, liked videos, and watch later queues
-- Real-time validation and error handling
-- Metadata extraction (video count, total duration, average video length)
-
-#### **The Architect Engine**
-- **Playback Speed Multipliers:** Calculate durations at 1.25x, 1.5x, 1.75x, and 2x speeds
-- **Partitioning System:** Break playlists into custom-sized chunks (e.g., 4-hour study sessions)
-- **Time-to-Finish Calculator:** Input available hours per day → Get completion date
-- **Manual Entry Mode:** Add individual videos or custom time blocks
-
-#### **Smart Scheduling**
-- "Complete by" date reverse engineering
-- Daily time allocation planning
-- Rest day integration
-- Weekend vs. weekday scheduling options
-
-### Gamification & Engagement
-
-#### **Progress Tracking Dashboard**
-- Visual completion meters
-- Streak tracking for consistent study sessions
-- Historical view of completed playlists
-- Time saved through speed optimization metrics
-
-#### **Achievement System**
-- Milestone badges (First 10 hours, First 50 hours, Speed Demon at 2x)
-- Completion certificates for major playlists
-- Personal stats (Total hours planned, Videos conquered, etc.)
-
-#### **Smart Insights**
-- "You're 67% faster than average learners" (based on speed preferences)
-- Optimal study session recommendations based on playlist structure
-- Content difficulty estimation via video duration patterns
-
----
-
-## 👥 User Personas
-
-### 📚 The "Night-Before-Exam" Student
-**Profile:** University student, 20-23 years old  
-**Pain Point:** "I have a 15-hour lecture playlist and the exam is in 3 days. Can I actually do this?"  
-**Use Case:** Needs instant reality check on feasibility + speed recommendations + daily breakdown  
-**Success Metric:** Reduces anxiety through concrete planning; actually completes the material
-
-### 💼 The Corporate Upskiller
-**Profile:** Working professional, 25-40 years old  
-**Pain Point:** "I found a 30-hour web development course but only have 1 hour per day after work."  
-**Use Case:** Needs long-term planning with realistic timelines + progress tracking for motivation  
-**Success Metric:** Completes course over 6 weeks; sees measurable skill development
-
-### 🎓 The Certification Hunter
-**Profile:** Career switcher, certification seeker  
-**Pain Point:** "AWS certification requires 40+ hours of video content. How do I structure this?"  
-**Use Case:** Needs partitioning by topic modules + optimal speed settings + completion tracking  
-**Success Metric:** Completes certification prep ahead of exam date with full coverage
-
-### 🚀 The Curiosity Binger
-**Profile:** Lifelong learner, 18-65 years old  
-**Pain Point:** "I've added 50 videos to Watch Later but never know when I'll actually finish them."  
-**Use Case:** Needs watch later queue analysis + realistic time estimates + motivation to start  
-**Success Metric:** Transforms vague intentions into completed learning sessions
-
-### 🏋️ The Productivity Optimizer
-**Profile:** Efficiency-focused learner  
-**Pain Point:** "I can handle 2x speed on some content—how much time could I actually save?"  
-**Use Case:** Needs speed comparison tools + time-saved metrics + challenge mindset  
-**Success Metric:** Maximizes content consumption while maintaining comprehension
-
----
-
-## 🎨 Design Philosophy
-
-### Visual Language
-- **Minimalist Precision:** Clean interfaces with purposeful negative space
-- **Typography Hierarchy:** Clear information architecture through font choices
-- **Micro-interactions:** Subtle animations that provide feedback without distraction
-- **Data Visualization:** Progress and planning visualized through elegant charts
-
-### UX Principles
-1. **Zero Friction Entry:** Paste URL → Instant results
-2. **Progressive Disclosure:** Advanced features available but not overwhelming
-3. **Intelligent Defaults:** Pre-select 1.5x speed based on research showing optimal comprehension/speed balance
-4. **Mobile-First Responsive:** Equal experience across devices
-
----
-
----
-
-## 🚧 Current Development Status
-
-**Phase 1 (MVP):** ✅ Complete
-- YouTube playlist analysis
-- Duration calculations with speed multipliers
-- Basic UI and responsive design
-
-**Phase 2 (Architect Engine):** ✅ Complete
-- ✅ Intelligent partitioning system (custom session lengths)
-- ✅ Time-to-finish calculator (daily hours, completion dates)
-- ✅ Advanced speed features (comparison table, time saved metrics)
-- ✅ Manual entry with flexible time parsing
-- ✅ Export capabilities (PDF, CSV, shareable links)
-- ✅ Zustand state management with persistence
-- ✅ Framer Motion animations
-
-**Phase 3A (Auth & Database):** ✅ Complete
-- ✅ NextAuth.js v5 with Google & GitHub OAuth
-- ✅ Supabase (PostgreSQL) database with RLS
-- ✅ Repository layer (PlaylistRepository, UserRepository, AchievementRepository)
-- ✅ Protected dashboard with sidebar navigation
-
-**Phase 3B (Premium UI):** ✅ Complete
-- ✅ Dark mode (next-themes, system/light/dark toggle)
-- ✅ Command palette (Cmd+K) via cmdk
-- ✅ Framer Motion page transitions & animations
-- ✅ Toast notifications (sonner)
-- ✅ Grid/list/compact view controls
-
-**Phase 3C (Gamification):** ✅ Complete
-- ✅ 12 achievements with unlock detection
-- ✅ Leaderboard (materialized view, opt-in)
-- ✅ Progress tracking (streaks, heatmap, circular progress)
-- ✅ Milestone celebrations with confetti
-
-**Phase 3D (Analytics, Onboarding & Email):** ✅ Complete
-- ✅ Analytics dashboard (InsightCards + MonthlyProgressChart)
-- ✅ Guided onboarding tour (shepherd.js, 5 steps)
-- ✅ Email templates (@react-email + Resend)
-- ✅ Error boundary, performance utilities
-- ✅ Settings & Help pages
-
-**Post-3D Polish:** ✅ Complete
-- ✅ Playlist library page (/dashboard/playlists) with filter tabs & search
-- ✅ Dashboard search page (/dashboard/search) with full-text filtering
-- ✅ 8-item sidebar navigation (Dashboard, Playlists, Planner, Search, Achievements, Analytics, Settings, Help)
-- ✅ Analytics server→client split (AnalyticsContent wrapper)
-- ✅ Planner ↔ Dashboard navigation
-- ✅ shepherd.js direct integration (replaced react-shepherd)
-
-**Phase 4 (Ecosystem):** 📅 Planned
-- Browser extension
-- Mobile apps
-- Premium features (Stripe)
-- AI-powered insights
-
-See [ROADMAP.md](./ROADMAP.md) for detailed phase breakdown and [PHASE3_COMPLETE.md](./PHASE3_COMPLETE.md) for Phase 3 technical details.
-
----
-
-## 🛠️ Tech Stack
-
-**Frontend:**
-- Next.js 14.1+ (App Router)
-- TypeScript 5.3+ (Strict Mode)
-- Tailwind CSS 3.4+
-- Shadcn/UI + Radix UI (22 components)
-- Framer Motion 12.34+
-- Zustand 4.5+ (5 stores)
-
-**Backend:**
-- Node.js + Express 4
-- TypeScript (Strict)
-- YouTube Data API v3
-- Zod validation
-
-**Database & Auth:**
-- Supabase (PostgreSQL) with Row-Level Security
-- NextAuth.js v5 (Google & GitHub OAuth)
-- @auth/supabase-adapter
-
-**Key Libraries:**
-- shepherd.js (Guided onboarding tour)
-- Recharts (Analytics charts)
-- cmdk (Command palette — Cmd+K)
-- date-fns (Date manipulation)
-- jsPDF + jspdf-autotable (PDF generation)
-- Lucide Icons (UI icons)
-- Sonner (Toast notifications)
-- Resend + @react-email (Email templates)
-
-See [TECH_STACK.md](./TECH_STACK.md) for comprehensive stack details.
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+
-- YouTube Data API v3 key
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Set up environment variables
-cd backend
-cp .env.example .env
-# Add your YOUTUBE_API_KEY
-
-cd ../frontend
-cp .env.example .env.local
-# Add Supabase, NextAuth, OAuth, and Resend keys (see SETUP.md)
-
-# Start development (both frontend + backend)
-cd ..
-npm run dev
+```
+Browser ─► Next.js 14 frontend (:3000) ─► Supabase PostgreSQL
+              │  Auth.js (Google, JWT)
+              └─► Express backend (:5000) ─► YouTube Data API v3
 ```
 
-Frontend: `http://localhost:3000`  
-Backend API: `http://localhost:5000`
+npm-workspaces monorepo: `backend/` (Express + TypeScript, YouTube only), `frontend/` (Next.js App Router + Tailwind + Zustand), `supabase/` (SQL applied by hand). Details in [ARCHITECTURE.md](./documents/ARCHITECTURE.md).
 
-See [SETUP.md](./SETUP.md) for detailed installation instructions including Supabase and OAuth setup.
+## Quick start
 
----
+Requires Node ≥ 18, a YouTube Data API key, a Supabase project and a Google OAuth client.
 
-## 📚 Documentation
+```bash
+npm install
+cp backend/.env.example backend/.env           # set YOUTUBE_API_KEY
+cp frontend/.env.example frontend/.env.local   # Supabase, Google OAuth, NEXTAUTH_SECRET
+# apply supabase/schema.sql → fix-nextauth.sql → migrations/* in the Supabase SQL editor
+npm run dev                                    # frontend :3000, backend :5000
+```
 
-All documentation is located in the `documents/` folder:
+Production build: `npm run build`, then `npm start` in `backend/` and `frontend/`. Full setup, environment variables, database order, security notes and troubleshooting: [DEPLOYMENT.md](./documents/DEPLOYMENT.md).
 
-- **[ROADMAP.md](./documents/ROADMAP.md)** - Development phases and timelines
-- **[TECH_STACK.md](./documents/TECH_STACK.md)** - Complete technology choices
-- **[ARCHITECTURE.md](./documents/ARCHITECTURE.md)** - Full system architecture
-- **[PROJECT_STRUCTURE.md](./documents/PROJECT_STRUCTURE.md)** - Complete file tree
-- **[SETUP.md](./documents/SETUP.md)** - Installation, Supabase, and OAuth guide
-- **[QUICK_START.md](./documents/QUICK_START.md)** - Quick-start guide
-- **[API_CONTRACT.md](./documents/API_CONTRACT.md)** - Backend API specification
-- **[CHANGELOG.md](./documents/CHANGELOG.md)** - Version history
-- **[PHASE_2_IMPLEMENTATION.md](./documents/PHASE_2_IMPLEMENTATION.md)** - Phase 2 details
-- **[PHASE_3.md](./documents/PHASE_3.md)** - Phase 3 (A–D) complete summary
+## Documentation
 
----
+| File | Contents |
+|---|---|
+| [documents/DEPLOYMENT.md](./documents/DEPLOYMENT.md) | Setup, env vars, database, OAuth, build/run, production checklist, security, troubleshooting |
+| [documents/ARCHITECTURE.md](./documents/ARCHITECTURE.md) | System design, stack, repository structure, routes, modules, data model, API reference |
+| [documents/DEVELOPMENT_PLAN.md](./documents/DEVELOPMENT_PLAN.md) | Delivered phases, known limitations, future improvements |
+| [backend/README.md](./backend/README.md), [frontend/README.md](./frontend/README.md) | Per-package commands |
+| [CLAUDE.md](./CLAUDE.md) | Contributor conventions (commit style, design tokens, level-math sync) |
 
-## 🤝 Contributing
+## Status
 
-We're in active development! Contributions, feature requests, and feedback are welcome.
+Core product, auth, dashboard, gamification and analytics are implemented. **Before opening to untrusted users, read the security limitation on row-level security in [DEVELOPMENT_PLAN.md](./documents/DEVELOPMENT_PLAN.md#2-known-limitations-and-issues).** Email notifications are scaffolded but not yet sent.
 
----
+## License
 
-## 📄 License
-
-This project is licensed under the MIT License—see LICENSE file for details.
-
----
-
-## 🔗 Links
-
-- **Live Demo:** Coming Soon
-- **Documentation:** [See docs above]
-- **API Reference:** Coming Soon
-- **Chrome Extension:** Planned for Phase 4
-
----
-
-**Built for learners, by learners. Time is finite. Make it count.**
-
+MIT is declared in `backend/package.json`; no `LICENSE` file is present yet.

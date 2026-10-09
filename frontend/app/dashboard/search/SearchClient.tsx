@@ -24,17 +24,17 @@ function formatDuration(seconds: number): string {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   planning: {
     label: 'Planning',
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    color: 'bg-primary text-primary-foreground',
     icon: <BookOpen className="h-3 w-3" />,
   },
   in_progress: {
     label: 'In Progress',
-    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+    color: 'bg-flame-from text-primary-foreground',
     icon: <Play className="h-3 w-3" />,
   },
   completed: {
     label: 'Completed',
-    color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    color: 'bg-chart-3 text-primary-foreground',
     icon: <CheckCircle2 className="h-3 w-3" />,
   },
 }
@@ -127,7 +127,7 @@ export function SearchClient({ playlists }: SearchClientProps) {
                   {/* Status badge */}
                   <span
                     className={cn(
-                      'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                      'flex shrink-0 items-center gap-1 border-[3px] border-ink px-2 py-0.5 text-xs font-bold',
                       status.color
                     )}
                   >

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Playlist, PlaylistInsert, PlaylistUpdate, Video, VideoInsert, VideoUpdate } from '@/types/database'
+import { describeDatabaseError } from '@/lib/repositories/errors'
 
 export class PlaylistRepository {
   private supabase = createClient()
@@ -13,7 +14,7 @@ export class PlaylistRepository {
 
     if (error) {
       console.error('Error creating playlist:', error.message, error.details, error.hint)
-      throw new Error(`Database error: ${error.message}`)
+      throw new Error(describeDatabaseError(error, 'Could not save playlist'))
     }
 
     return playlist
@@ -42,7 +43,7 @@ export class PlaylistRepository {
       console.error('Error creating videos:', videosError.message, videosError.details)
       // Roll back playlist creation if videos fail
       await this.delete(playlist.id)
-      throw new Error(`Failed to save videos: ${videosError.message}`)
+      throw new Error(describeDatabaseError(videosError, 'Could not save videos'))
     }
 
     return { playlist, videos: createdVideos }

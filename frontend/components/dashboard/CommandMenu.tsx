@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Command } from 'cmdk'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useCommandMenuStore } from '@/store/useCommandMenuStore'
 import {
   LayoutDashboard,
   ListVideo,
@@ -17,19 +18,21 @@ import {
 
 export function CommandMenu() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
+  const open = useCommandMenuStore((s) => s.open)
+  const setOpen = useCommandMenuStore((s) => s.setOpen)
+  const toggle = useCommandMenuStore((s) => s.toggle)
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        toggle()
       }
     }
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [])
+  }, [toggle])
 
   const runCommand = (command: () => void) => {
     setOpen(false)
@@ -39,10 +42,10 @@ export function CommandMenu() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0 max-w-2xl overflow-hidden">
-        <Command className="rounded-lg border-0 shadow-none">
+        <Command className="border-0 shadow-none">
           <Command.Input
             placeholder="Type a command or search..."
-            className="h-12 px-4 text-base border-b"
+            className="h-12 w-full border-b-[3px] border-ink bg-transparent px-4 text-base outline-none"
           />
           <Command.List className="max-h-[400px] overflow-y-auto p-2">
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground">

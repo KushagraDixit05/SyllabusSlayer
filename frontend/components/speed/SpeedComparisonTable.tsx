@@ -23,7 +23,7 @@ export function SpeedComparisonTable() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <Clock className="h-5 w-5 text-foreground" />
           Speed Comparison
         </CardTitle>
       </CardHeader>
@@ -41,27 +41,21 @@ export function SpeedComparisonTable() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 className={`
-                  p-4 rounded-lg border-2 transition-all
-                  ${isActive 
-                    ? 'bg-accent border-primary' 
-                    : 'bg-card border-border hover:border-border/80'
-                  }
+                  border-[3px] border-ink p-4 transition-all
+                  ${isActive ? 'bg-accent shadow-brutal-sm' : 'bg-card'}
                 `}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`
-                      flex items-center justify-center w-12 h-12 rounded-full font-mono font-bold
-                      ${isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted text-muted-foreground'
-                      }
+                      flex h-12 w-12 shrink-0 items-center justify-center border-[3px] border-ink font-mono text-sm font-bold
+                      ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}
                     `}>
                       {comparison.speed.toFixed(1)}x
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-foreground">
+                        <p className="font-display text-lg font-black tabular-nums text-foreground">
                           {formatDuration(comparison.totalDuration)}
                         </p>
                         {isActive && (
@@ -72,7 +66,7 @@ export function SpeedComparisonTable() {
                         )}
                       </div>
                       {comparison.timeSaved > 0 && (
-                        <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                        <p className="rounded-full mt-1 inline-flex items-center gap-1 border-[3px] border-ink bg-chart-3 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                           <TrendingDown className="h-3 w-3" />
                           Save {timeSavedHours > 0 ? `${timeSavedHours}h ` : ''}{timeSavedMinutes}m
                         </p>
@@ -81,7 +75,7 @@ export function SpeedComparisonTable() {
                   </div>
                   
                   <div className="hidden md:block text-right">
-                    <p className="text-sm text-muted-foreground">{comparison.timeSavedPercentage.toFixed(0)}% faster</p>
+                    <p className="text-sm font-medium text-muted-foreground">{comparison.timeSavedPercentage.toFixed(0)}% faster</p>
                   </div>
                 </div>
               </motion.div>
@@ -90,8 +84,8 @@ export function SpeedComparisonTable() {
         </div>
 
         {/* Summary */}
-        <div className="mt-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-          <p className="text-sm text-muted-foreground">
+        <div className="rounded-lg mt-6 border-[3px] border-ink bg-muted p-4">
+          <p className="font-mono text-xs text-muted-foreground">
             💡 <strong>Pro tip:</strong> Most people comprehend well at 1.5-1.75x speed. 
             Start at 1.25x and gradually increase as you get comfortable!
           </p>

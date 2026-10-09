@@ -25,10 +25,10 @@ export function UserMenu({ session }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center space-x-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <button className="flex items-center space-x-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.image || undefined} alt={user.name || ''} />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+            <AvatarFallback className="bg-primary font-display font-black text-primary-foreground">
               {user.name?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
@@ -68,7 +68,7 @@ export function UserMenu({ session }: UserMenuProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          className="text-red-600 focus:text-red-600"
+          className="text-destructive focus:text-destructive"
           onClick={() => signOut({ callbackUrl: '/' })}
         >
           <LogOut className="mr-2 h-4 w-4" />

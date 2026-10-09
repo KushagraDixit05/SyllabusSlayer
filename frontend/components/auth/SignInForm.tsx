@@ -3,7 +3,8 @@
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { WavyBackground } from "@/components/ui/wavy-background"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 export default function SignInForm() {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
@@ -18,30 +19,22 @@ export default function SignInForm() {
   }
 
   return (
-    <WavyBackground
-      containerClassName="min-h-screen w-full"
-      backgroundFill="#09090b"
-      colors={["#4f46e5", "#7c3aed", "#a855f7", "#6366f1", "#8b5cf6"]}
-      blur={8}
-      speed="slow"
-      waveOpacity={0.4}
-    >
+    <div className="brutal-dots flex min-h-screen w-full items-center justify-center bg-background px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-[440px] px-4"
+        className="relative z-10 w-full max-w-[440px]"
       >
-        <div className="flex flex-col items-center rounded-2xl border border-white/[0.08] bg-white/[0.05] backdrop-blur-xl px-8 py-10 shadow-2xl shadow-black/40">
+        <Card variant="elevated" className="flex flex-col items-center px-8 py-10">
           {/* Logo + Brand */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="flex items-center gap-2.5 mb-8"
+            className="mb-8 flex items-center gap-2.5"
           >
-            {/* Gradient logo icon */}
-            <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-lg border-[3px] border-ink bg-primary">
               <svg
                 width="20"
                 height="20"
@@ -49,30 +42,24 @@ export default function SignInForm() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  d="M12 2L2 7L12 12L22 7L12 2Z"
-                  fill="white"
-                  fillOpacity="0.9"
-                />
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                 <path
                   d="M2 17L12 22L22 17"
-                  stroke="white"
-                  strokeOpacity="0.7"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <path
                   d="M2 12L12 17L22 12"
-                  stroke="white"
-                  strokeOpacity="0.8"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             </div>
-            <span className="text-white/90 font-semibold text-lg tracking-tight">
+            <span className="font-display text-lg font-black tracking-tight text-foreground">
               Syllabus Slayer
             </span>
           </motion.div>
@@ -82,7 +69,7 @@ export default function SignInForm() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="text-[28px] sm:text-[32px] font-bold text-white tracking-tight mb-10 text-center"
+            className="mb-10 text-center font-display text-[28px] font-black leading-tight tracking-tight text-foreground sm:text-[32px]"
           >
             Sign in to your account
           </motion.h1>
@@ -92,29 +79,15 @@ export default function SignInForm() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="w-full flex gap-3 mb-6"
+            className="mb-6 flex w-full gap-3"
           >
-            {/* GitHub Button */}
-            <button
-              onClick={() => handleOAuthSignIn("github")}
-              disabled={loadingProvider !== null}
-              className="group relative flex-1 h-[46px] flex items-center justify-center gap-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/80 text-sm font-medium transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.15] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loadingProvider === "github" ? (
-                <Spinner />
-              ) : (
-                <>
-                  <GitHubIcon />
-                  <span>Login with GitHub</span>
-                </>
-              )}
-            </button>
-
-            {/* Google Button */}
-            <button
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
               onClick={() => handleOAuthSignIn("google")}
               disabled={loadingProvider !== null}
-              className="group relative flex-1 h-[46px] flex items-center justify-center gap-2.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/80 text-sm font-medium transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.15] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 gap-2.5"
             >
               {loadingProvider === "google" ? (
                 <Spinner />
@@ -124,7 +97,7 @@ export default function SignInForm() {
                   <span>Login with Google</span>
                 </>
               )}
-            </button>
+            </Button>
           </motion.div>
 
           {/* Divider */}
@@ -132,9 +105,9 @@ export default function SignInForm() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="w-full flex items-center gap-4 mb-6"
+            className="mb-6 flex w-full items-center gap-4"
           >
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="h-[3px] flex-1 rounded-full bg-ink/15" />
           </motion.div>
 
           {/* Continue with Email button (triggers Google as primary) */}
@@ -144,34 +117,25 @@ export default function SignInForm() {
             transition={{ duration: 0.4, delay: 0.45 }}
             className="w-full"
           >
-            <button
+            <Button
+              type="button"
+              size="lg"
               onClick={() => handleOAuthSignIn("google")}
               disabled={loadingProvider !== null}
-              className="w-full h-[46px] flex items-center justify-center gap-2 rounded-lg bg-white text-[#09090b] text-sm font-semibold transition-all duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full gap-2"
             >
-              {loadingProvider === "google" ? (
-                <Spinner dark />
-              ) : (
-                <span>Continue with Email</span>
-              )}
-            </button>
+              {loadingProvider === "google" ? <Spinner /> : <span>Continue with Email</span>}
+            </Button>
           </motion.div>
-        </div>
+        </Card>
       </motion.div>
-    </WavyBackground>
+    </div>
   )
 }
 
 /* ─── Inline Icons ─── */
 
-function GitHubIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-    </svg>
-  )
-}
-
+/** Google's brand hexes are fixed by their guidelines, so they stay literal. */
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -195,10 +159,10 @@ function GoogleIcon() {
   )
 }
 
-function Spinner({ dark = false }: { dark?: boolean }) {
+function Spinner() {
   return (
     <svg
-      className={`animate-spin h-5 w-5 ${dark ? "text-[#09090b]" : "text-white"}`}
+      className="h-5 w-5 animate-spin text-current"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

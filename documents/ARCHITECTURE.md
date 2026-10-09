@@ -1,546 +1,190 @@
-# Architecture Documentation: Syllabus Slayer
+# Architecture
 
-> **Production-grade monorepo architecture — Phases 1 through 3D complete (with post-3D polish)**
+System design, stack, repository layout, modules and API reference for SyllabusSlayer. Setup and operations: [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-## 🎯 Architecture Philosophy
+## 1. Overview
 
-### Core Principles
+SyllabusSlayer turns YouTube playlists into study plans: it fetches a playlist's videos and durations, computes total time at several playback speeds, splits the playlist into study sessions, schedules completion dates, and tracks progress (streaks, XP, achievements, leaderboard, analytics) for signed-in users.
 
-1. **Separation of Concerns**
-   - Backend handles all business logic and external API integration
-   - Frontend focuses purely on presentation and user interaction
-   - Clear API contract between layers
-
-2. **Scalability from Day One**
-   - Monorepo structure allows independent scaling
-   - Backend can serve multiple clients (web, mobile, extension)
-   - Clean architecture enables easy feature addition in future phases
-
-3. **Type Safety Throughout**
-   - TypeScript in both backend and frontend
-   - Shared type definitions for API contracts
-   - Compile-time error catching
-
-4. **Developer Experience**
-   - Hot reload in both environments
-   - Clear folder structure
-   - Comprehensive error handling
-   - Self-documenting code
-
-## 🏛️ System Architecture
+## 2. System architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          User Browser                                 │
-│                                                                        │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │                   Frontend (Next.js 14)                      │    │
-│  │                                                               │    │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐ │    │
-│  │  │  Auth Layer  │  │  UI/Dashboard│  │  Analytics/Email  │ │    │
-│  │  │  NextAuth.js │  │  Components  │  │  Onboarding       │ │    │
-│  │  └──────┬───────┘  └──────┬───────┘  └────────┬──────────┘ │    │
-│  │         │                 │                    │             │    │
-│  │  ┌──────▼─────────────────▼────────────────────▼──────────┐ │    │
-│  │  │         Zustand Store Layer (Planner, Playlists,        │ │    │
-│  │  │          Saved, View, UI, Onboarding)                   │ │    │
-│  │  └────────────────────────┬───────────────────────────────┘ │    │
-│  │                           │                                   │    │
-│  │  ┌────────────────────────▼───────────────────────────────┐ │    │
-│  │  │              Repository / Data Access Layer             │ │    │
-│  │  │  PlaylistRepository  UserRepository  AchievementRepo   │ │    │
-│  │  └────────────────────────────────────────────────────────┘ │    │
-│  └─────────────────────────────────┬───────────────────────────┘    │
-└────────────────────────────────────┼────────────────────────────────┘
-                                     │
-              ┌──────────────────────┼──────────────────────┐
-              │ HTTP/REST            │ Supabase SDK          │ Resend API
-              ▼                      ▼                       ▼
-┌─────────────────────┐  ┌────────────────────────┐  ┌────────────────┐
-│  Backend            │  │  Supabase (PostgreSQL)  │  │  Resend Email  │
-│  (Node + Express)   │  │  - user_profiles        │  │  - Achievement │
-│  - YouTube API      │  │  - playlists            │  │    emails      │
-│  - Duration calc    │  │  - achievements         │  │  - Weekly      │
-│  - Playlist parse   │  │  - activity_log         │  │    summaries   │
-└─────────────────────┘  │  - leaderboard view     │  └────────────────┘
-         │               └────────────────────────┘
-         ▼
-┌─────────────────────┐
-│  YouTube Data API   │
-│  v3                  │
-└─────────────────────┘
+┌────────────────────────── Browser ───────────────────────────┐
+│ Next.js 14 client: pages, Zustand stores (planner state       │
+│ persisted in localStorage), Supabase browser client (anon key)│
+└───────┬───────────────────────────┬──────────────────────────┘
+        │ SSR / RSC / NextAuth      │ GET /api/playlist
+        ▼                           ▼
+┌───────────────────┐        ┌────────────────────┐      ┌──────────────────┐
+│ Frontend server   │        │ Backend (Express)  │ ───► │ YouTube Data API │
+│ Next.js 14 :3000  │        │ :5000              │      │ v3               │
+│ • Auth.js (Google)│        └────────────────────┘      └──────────────────┘
+│ • repositories    │──► Supabase PostgreSQL (anon key, no RLS)
+│ • lib/email       │──► Resend (client + templates exist; no code path sends yet)
+└───────────────────┘
 ```
 
-## 📂 Backend Architecture
+Responsibilities
+- **Backend** — only the YouTube integration and duration maths. Stateless, public, rate-limited.
+- **Frontend** — everything else: UI, auth, persistence (Supabase via repositories), planning algorithms (client-side), exports.
+- **Planner state** is client-side (`usePlannerStore`, localStorage key `planner-storage`); saved playlists/progress/gamification are in Supabase.
 
-### MVC Pattern Implementation
+## 3. Tech stack (as installed)
 
-```
-backend/src/
-├── config/           # Configuration & environment
-│   └── config.ts     # Centralized config management
-│
-├── routes/           # URL routing
-│   └── playlistRoutes.ts
-│
-├── controllers/      # Request/Response handling
-│   └── playlistController.ts
-│
-├── services/         # Business logic
-│   └── youtubeService.ts
-│
-├── utils/            # Helper functions
-│   ├── urlParser.ts
-│   └── durationCalculator.ts
-│
-├── middleware/       # Express middleware
-│   ├── rateLimiter.ts
-│   └── errorHandler.ts
-│
-├── types/            # TypeScript definitions
-│   └── index.ts
-│
-├── app.ts            # Express app setup
-└── server.ts         # Server entry point
-```
+| Layer | Technology |
+|---|---|
+| Monorepo | npm workspaces (`backend`, `frontend`), `concurrently` for `npm run dev` |
+| Frontend | Next.js 14 App Router, React 18, TypeScript (strict), Tailwind CSS 3.4 + `tailwindcss-animate`, shadcn-style primitives on Radix UI (`components/ui/`), Framer Motion 12, Zustand 4, lucide-react, sonner (toasts), cmdk (⌘K), next-themes, Recharts 3, `shepherd.js` (onboarding tour), react-confetti, `@dnd-kit` (reorder), date-fns 2, jsPDF + jspdf-autotable, simplex-noise |
+| Auth | next-auth 5 beta (Auth.js, `@auth/core` pinned to 0.41.0), Google provider, JWT sessions |
+| Data | Supabase PostgreSQL via `@supabase/supabase-js` + `@supabase/ssr` |
+| Email | Resend + `@react-email/components` |
+| Backend | Node.js, Express 4, TypeScript (CommonJS → `dist/`), Zod, helmet, cors, morgan, express-rate-limit, dotenv; native `fetch`; `tsx` for dev |
+| Design | Tokens from CSS custom properties in `frontend/app/globals.css`, exposed as Tailwind colors (`brand-*`, `flame-*`, `rarity-*`, `gold`, `sidebar-*`); fonts Inter, Space Grotesk, JetBrains Mono; "brutalist" component style (`brutal-*` charts, `stat-tile`). Do not hard-code hex/raw palette colors (see `CLAUDE.md`). |
 
-### Request Flow
+Packaging quirk: `shepherd.js` is imported by `components/onboarding/OnboardingTour.tsx` but is **not declared** in `frontend/package.json`; it arrives transitively through `react-shepherd` (which is otherwise unused). Declare `shepherd.js` directly before removing `react-shepherd`.
+
+## 4. Repository structure
 
 ```
-1. HTTP Request
-   ↓
-2. Rate Limiter Middleware
-   ↓
-3. CORS Middleware
-   ↓
-4. Router (playlistRoutes.ts)
-   ↓
-5. Controller (playlistController.ts)
-   - Validate request (Zod schema)
-   - Extract playlist ID
-   ↓
-6. Service (youtubeService.ts)
-   - Fetch from YouTube API
-   - Parse durations
-   - Calculate speeds
-   ↓
-7. Controller formats response
-   ↓
-8. HTTP Response (JSON)
+SyllabusSlayer/
+├── backend/                    Express API
+│   └── src/ config/ routes/ controllers/ services/ middleware/ utils/ types/ app.ts server.ts
+├── frontend/                   Next.js app
+│   ├── app/                    routes (below), globals.css, providers.tsx, layout.tsx
+│   ├── components/             feature folders + ui/ primitives
+│   ├── emails/                 react-email templates
+│   ├── hooks/ store/ types/
+│   ├── lib/                    algorithms, repositories, supabase, auth, analytics, email, gamification
+│   └── middleware.ts           Auth.js middleware
+├── supabase/                   schema.sql, fix-nextauth.sql, migrations/, disable-rls-temp.sql
+├── documents/                  this documentation
+├── CLAUDE.md                   contributor/AI-assistant conventions
+└── package.json                workspace root (dev/build scripts)
 ```
+(`.agents/`, `.claude/`, `skills-lock.json` hold AI-assistant skill files, not application code.)
 
-### Error Handling Strategy
+### Routes
 
-**3-Layer Error Handling:**
+| Route | Access | Purpose |
+|---|---|---|
+| `/` | public | Landing page (`components/landing/*`) |
+| `/kage` | public | Alternate landing rendered in an iframe (`components/kage`, `public/landing-pages/kage.html`); not crawlable by design — `/` is the indexable landing |
+| `/planner` | public (sidebar when signed in) | Playlist analyser + planner (Partition / Schedule / Speed / Manual tabs, export) |
+| `/shared/[id]` | public | Read-only view of a shared plan (state encoded in the URL) |
+| `/auth/signin`, `/auth/error` | public | Auth.js custom pages |
+| `/api/auth/[...nextauth]` | public | Auth.js handlers |
+| `/dashboard` | signed in | Stats, active playlists, progress, recent activity |
+| `/dashboard/playlists`, `/dashboard/playlists/[id]` | signed in | Library (filter/search/view modes) and playlist detail |
+| `/dashboard/search` | signed in | Playlist search |
+| `/dashboard/achievements` | signed in | Achievement grid |
+| `/dashboard/leaderboard` | signed in | Hours / streak / completion boards (opt-in) |
+| `/dashboard/analytics` | signed in | Insights and charts |
+| `/dashboard/profile`, `/settings`, `/help` | signed in | Profile (theme preference), settings, FAQ |
 
-1. **Service Layer:** Throws `AppError` for known issues
-2. **Controller Layer:** Catches and forwards to error middleware
-3. **Middleware Layer:** Formats errors for client consumption
-
-```typescript
-// Custom error with context
-throw new AppError('Playlist not found', 404, 'PLAYLIST_NOT_FOUND');
-
-// Error middleware transforms to:
-{
-  "success": false,
-  "error": {
-    "message": "Playlist not found",
-    "code": "PLAYLIST_NOT_FOUND"
-  }
-}
-```
-
-### YouTube API Integration
-
-**Quota-Efficient Design:**
-
-- Batch video detail requests (50 videos per API call)
-- Pagination handling for large playlists
-- Error handling for quota exceeded
-
-**Cost Analysis:**
-```
-Playlist with 200 videos:
-- Playlist details: 1 unit
-- Playlist items (4 pages × 50): 4 units
-- Video details (4 batches × 50): 4 units
-Total: 9 units (0.09% of daily quota)
-```
-
-## 📱 Frontend Architecture
-
-### Component Hierarchy
+## 5. Backend
 
 ```
-app/
-├── layout.tsx (Root Layout + Providers)
-│   ├── page.tsx (Home — playlist analyser)
-│   │   ├── PlaylistForm
-│   │   ├── LoadingState (conditional)
-│   │   ├── ErrorMessage (conditional)
-│   │   └── ResultsDisplay (conditional)
-│   │
-│   ├── auth/signin/page.tsx
-│   ├── auth/error/page.tsx
-│   │
-│   ├── dashboard/layout.tsx (Sidebar + Header + CommandMenu + OnboardingTour)
-│   │   ├── dashboard/page.tsx (Stats + ActivePlaylists + ProgressOverview)
-│   │   ├── dashboard/playlists/ (PlaylistsClient — filter, search, cards)
-│   │   ├── dashboard/search/ (SearchClient — full-text search)
-│   │   ├── dashboard/analytics/ (AnalyticsContent client wrapper)
-│   │   ├── dashboard/achievements/
-│   │   ├── dashboard/settings/
-│   │   └── dashboard/help/
-│   │
-│   ├── planner/page.tsx (back-to-dashboard nav)
-│   └── shared/[id]/page.tsx
+GET request → rate limiter → helmet/CORS → router → playlistController (Zod) → youtubeService → JSON
 ```
+- `config/config.ts` — env loading; throws if `YOUTUBE_API_KEY` missing.
+- `utils/urlParser.ts` — extracts the playlist ID from `…/playlist?list=`, `…/watch?v=…&list=` or a bare ID matching `^(PL|UU|LL|RD|OL)[A-Za-z0-9_-]+$`.
+- `services/youtubeService.ts` — three YouTube calls: `playlists` (title), `playlistItems` (paged, 50/page), `videos` (durations, batched 50). A 200-video playlist ≈ 9 quota units of the 10,000/day free quota.
+- `utils/durationCalculator.ts` — totals, average, formatting, speeds 1 / 1.25 / 1.5 / 1.75 / 2.
+- `middleware/errorHandler.ts` — `AppError(message, status, code)`; every error returns `{success:false,error:{message,code}}`; details are logged, never returned.
 
-### State Management Strategy
+### API reference
+Base: `{backend}/api`. All responses: `{ "success": true, "data": … }` or `{ "success": false, "error": { "message", "code" } }`. No authentication. Rate limit 100 req / 15 min / IP on `/api/*` (`RateLimit-*` headers).
 
-**Local State (useState):**
-- Component-specific UI state
-- Form input values
-- Temporary UI states (copied tooltip)
+**`GET /api/playlist?url=<youtube url>`** or **`?playlistId=<id>`** (one required)
 
-**Global State (Zustand):**
-- Loading states (shared across components)
-- Error messages
-- Future: User preferences, theme
-
-**Server State (Custom Hook):**
-- `usePlaylist` hook encapsulates API calls
-- Manages playlist data lifecycle
-- Coordinates with global loading/error states
-
-### Data Flow
-
-```
-User Input (PlaylistForm)
-   ↓
-usePlaylist.fetchPlaylist()
-   ↓
-lib/api.ts → Backend API
-   ↓
-useUIStore.setLoading(true)
-   ↓
-Success: setPlaylistData()
-Error: useUIStore.setError()
-   ↓
-ResultsDisplay renders data
-```
-
-### Component Design Principles
-
-**Single Responsibility:**
-- `PlaylistForm`: Input and submission only
-- `ResultsDisplay`: Data presentation only
-- `LoadingState`: Loading UI only
-- `ErrorMessage`: Error UI only
-
-**Composition over Inheritance:**
-- Small, reusable components
-- Props for configuration
-- No deep nesting
-
-**Type Safety:**
-```typescript
-// Props interfaces for all components
-interface PlaylistFormProps {
-  onSubmit: (input: string) => void;
-  onClear: () => void;
-}
-```
-
-## 🔄 API Contract
-
-### Endpoint: GET /api/playlist
-
-**Request:**
-```
-Query Parameters:
-- url: string (YouTube playlist URL) OR
-- playlistId: string (Direct playlist ID)
-```
-
-**Response (Success):**
 ```json
-{
-  "success": true,
-  "data": {
-    "title": "Complete Python Course",
-    "videoCount": 42,
-    "totalDuration": 15430,
-    "totalDurationFormatted": "4h 17m",
-    "averageVideoLength": 367,
-    "averageVideoLengthFormatted": "6m 7s",
-    "speeds": {
-      "1": "4h 17m",
-      "1.25": "3h 26m",
-      "1.5": "2h 51m",
-      "1.75": "2h 27m",
-      "2": "2h 8m"
-    },
-    "videos": [...]
-  }
-}
+{ "success": true, "data": {
+  "title": "Complete Python Course", "videoCount": 42,
+  "totalDuration": 15430, "totalDurationFormatted": "4h 17m",
+  "averageVideoLength": 367, "averageVideoLengthFormatted": "6m 7s",
+  "speeds": { "1": "4h 17m", "1.25": "3h 26m", "1.5": "2h 51m", "1.75": "2h 27m", "2": "2h 8m" },
+  "videos": [ { "id": "xyz123", "title": "Introduction", "duration": 600 } ] } }
 ```
 
-**Response (Error):**
-```json
-{
-  "success": false,
-  "error": {
-    "message": "Playlist not found or is private",
-    "code": "PLAYLIST_NOT_FOUND"
-  }
-}
-```
+**`GET /api/health`** → `{ "success": true, "data": { "status": "healthy", "timestamp": "<ISO 8601>" } }`
 
-## 🔐 Security Measures
+| Code | HTTP | Meaning |
+|---|---|---|
+| `VALIDATION_ERROR` | 400 | neither `url` nor `playlistId` |
+| `INVALID_URL` / `INVALID_PLAYLIST_ID` | 400 | unparsable URL / bad ID format |
+| `EMPTY_PLAYLIST` | 400 | no videos |
+| `PLAYLIST_NOT_FOUND` | 404 | missing or private |
+| `NOT_FOUND` | 404 | unknown route |
+| `QUOTA_EXCEEDED` | 429 | YouTube quota |
+| `RATE_LIMIT_EXCEEDED` | 429 | per-IP limit |
+| `API_ERROR` / `INTERNAL_ERROR` | 500 | upstream / unexpected |
 
-### Backend
+Frontend client: `frontend/lib/api.ts` (`fetchPlaylistData`, `healthCheck`) via `hooks/usePlaylist.ts`.
 
-1. **Helmet.js** - HTTP security headers
-2. **CORS** - Restricted origins
-3. **Rate Limiting** - 100 requests per 15 minutes per IP
-4. **Input Validation** - Zod schema validation
-5. **Error Sanitization** - No stack traces in production
+## 6. Frontend modules
 
-### Frontend
+**Planner engine (client-side, pure functions in `frontend/lib/`)**
+- `partitioning.ts` — session splitting that respects video boundaries; presets 60/90/120/180/240 min, custom 15–300 min, configurable breaks.
+- `scheduling.ts` — completion date from daily hours (separate weekday/weekend), rest days, start date.
+- `speed.ts` — preset speeds plus custom 0.25–3.0×, comparison and time-saved.
+- `timeParser.ts` — accepts `HH:MM:SS`, `1h 30m`, `90 minutes`, raw seconds, etc.; bulk entry format `Title | Duration`.
+- `pdfExport.ts`, `csvExport.ts`, `shareableLink.ts` (base64-encoded state in the URL, no server storage).
+- UI: `components/{partition,schedule,speed,manual,export}`; state `store/usePlannerStore.ts`.
 
-1. **Environment Variables** - API URL never hardcoded
-2. **XSS Prevention** - React auto-escaping
-3. **Type Safety** - TypeScript prevents runtime errors
+**Persistence and data access** — `lib/repositories/` (`playlist`, `user`, `achievement`, `activity`, `leaderboard`) are the only DB access path; Supabase clients in `lib/supabase/{client,server,env}.ts`. Tables touched by code: `user_profiles`, `playlists`, `videos`, `achievements`, `activity_log`. `components/progress/SessionCheckIn.tsx` exists but is not mounted anywhere.
 
-## 🚀 Performance Optimizations
+**Gamification**
+- XP / level: `lib/gamification/xpCurve.ts` — `level = floor(sqrt(xp/50)) + 1`; mirrored by SQL `xp_to_level`. Tier titles (Newcomer → Grandmaster Slayer, by level) in `tier.ts` are cosmetic.
+- Streaks: DB trigger `on_activity_logged` updates `current_streak` / `longest_streak` on each `activity_log` insert. `StreakFlame`, `StreakDisplay`, `ActivityHeatmap`.
+- Achievements: `lib/achievements/definitions.ts` (12) + `checker.ts`; unlocks queue in `useSavedPlaylistStore` and `GlobalAchievementNotifier` shows the modal. Milestone confetti: `lib/milestones/checker.ts`, `GlobalMilestoneNotifier`.
 
-### Backend
+| Name | Requirement | Rarity | Points |
+|---|---|---|---|
+| First Steps | 1 playlist | common | 10 |
+| Syllabus Slayer | 10 playlists | rare | 100 |
+| Marathon Runner | 50 h planned | epic | 150 |
+| Ultra Marathon | 100 h planned | legendary | 300 |
+| Getting Started | 3-day streak | common | 25 |
+| Week Warrior | 7-day streak | rare | 50 |
+| Month Master | 30-day streak | epic | 200 |
+| Centurion | 100-day streak | legendary | 500 |
+| Speed Demon | 50 h saved | rare | 75 |
+| Time Bender | 100 h saved | epic | 150 |
+| 2x Master | 10 playlists at 2× | epic | 200 |
+| Early Adopter | 1 playlist (as defined in code) | legendary | 1000 |
 
-1. **Minimal Dependencies** - Only essential packages
-2. **Native Fetch** - No Axios overhead
-3. **Efficient Algorithms** - Single-pass duration aggregation
-4. **Future: Redis Caching** - Cache playlist data (Phase 2+)
+- Leaderboard: opt-in (`leaderboard_opt_in` + `leaderboard_username`), three boards (hours, streak, completion) ranked live from `user_profiles`; UI in `components/leaderboard`.
 
-### Frontend
+**Analytics** — `lib/analytics/service.ts` computes daily average, most productive day, speed distribution, completion rate, streak history and monthly progress from `user_profiles`, `playlists`, `activity_log`. The page is a server component; `AnalyticsContent` is a `'use client'` wrapper because icon components can't cross the server→client boundary. Charts: Recharts plus `components/ui/brutal-*`.
 
-1. **Next.js Optimizations:**
-   - Automatic code splitting
-   - Image optimization (when images added)
-   - Font optimization (Inter font)
+**Onboarding / UX** — `OnboardingTour` (shepherd.js, 5 steps, auto-starts after first login, completion stored via `useOnboardingStore` in localStorage), `FeatureTooltip`, ⌘K `CommandMenu`, dark mode (`next-themes`, preference also in `user_profiles.theme_preference`), `ErrorBoundary`, performance hooks in `lib/utils/performance.ts`.
 
-2. **Component Optimizations:**
-   - Conditional rendering (only show what's needed)
-   - Efficient state updates
-   - Future: React.memo for expensive renders
+**Email** — `lib/email/{client,service}.ts` and templates `emails/{AchievementUnlocked,WeeklySummary}.tsx`; `EmailService` has `sendAchievementUnlocked`, `sendWeeklySummary`, `sendStreakReminder`. Nothing currently calls it (see limitations).
 
-3. **Bundle Size:**
-   - Minimal dependencies
-   - Lucide icons (tree-shakeable)
-   - Tailwind purges unused CSS
+**Zustand stores** (`frontend/store/`): `usePlannerStore` (persisted `planner-storage`), `useSavedPlaylistStore` (DB-synced playlists + pending achievements), `useUIStore` (loading/error), `useViewStore` (persisted grid/list/compact), `useOnboardingStore` (persisted), `useCommandMenuStore`.
 
-## 📊 Scalability Considerations
+## 7. Data model
 
-### Current Capacity
+| Table | Purpose / key columns |
+|---|---|
+| `user_profiles` | `id` TEXT (Google sub); display name, avatar, `theme_preference`, streaks (`current_streak`, `longest_streak`, `last_activity_date`), totals (`total_playlists_created/completed`, `total_hours_planned/completed`), `xp`, `total_hours_saved`, `speed_mastery_count`, `leaderboard_opt_in`, `leaderboard_username` |
+| `playlists` | saved playlist: `youtube_playlist_id`, `title`, `source`, `total_duration`, `adjusted_duration`, `playback_speed`, `status` (`planning`/`in_progress`/`completed`/`archived`), `completion_percentage` |
+| `videos` | videos per playlist |
+| `achievements` | unlocked achievements per user |
+| `activity_log` | event log with `duration_seconds`; drives streaks, heatmap, analytics |
+| `partitions`, `schedules`, `daily_schedules`, `templates` | in schema, not used by current code |
+| `leaderboard_stats` (materialized view) | ranked opted-in users; not read by the app |
 
-- **Backend:** Can handle 1000+ requests/hour comfortably
-- **Frontend:** Statically deployed, scales infinitely
-- **YouTube API:** 10,000 units/day = ~1,000 playlists/day
+Triggers/functions: `updated_at` triggers, `on_playlist_completed` → `update_user_stats_on_playlist_complete()` (completed totals, hours saved, 2×-mastery count), `on_activity_logged` → `update_streak_on_activity()`, `xp_to_level()`.
 
-### Future Scaling Paths
+## 8. Key decisions
 
-**Phase 2-3:**
-- Add Redis for playlist caching
-- Implement database for user data (Supabase)
-- Increase YouTube API quota (paid tier)
-
-**Phase 4:**
-- Microservices for heavy features
-- CDN for static assets
-- Load balancer for backend instances
-
-## 🧩 Why This Architecture?
-
-### Why Monorepo?
-
-✅ **Single source of truth**
-✅ **Shared types between frontend/backend**
-✅ **Coordinated versioning**
-✅ **Easier development workflow**
-
-❌ **Alternative (Separate Repos):**
-- More complex CI/CD
-- Type sync issues
-- Harder to maintain consistency
-
-### Why Separate Backend/Frontend?
-
-✅ **Independent deployment**
-✅ **Technology flexibility**
-✅ **Clear responsibilities**
-✅ **Multi-client support** (web, mobile, extension)
-
-❌ **Alternative (Next.js API Routes):**
-- Tight coupling
-- Harder to add mobile clients later
-- Less flexible deployment
-
-### Why Express over Fastify/Hono?
-
-✅ **Industry standard** - More resources/examples
-✅ **Mature ecosystem** - Well-tested middleware
-✅ **Team familiarity** - Lower learning curve
-
-### Why Zustand over Redux?
-
-✅ **Minimal boilerplate** - Less code, same functionality
-✅ **Simple mental model** - Hooks-based API
-✅ **Sufficient for Phase 1** - No complex state requirements
-
-## 🆕 Phase 3 Architecture Additions
-
-### Phase 3A — Authentication & Database
-
-```
-NextAuth.js v5 (OAuth)
-    ↓
-Google / GitHub OAuth providers
-    ↓
-@auth/supabase-adapter
-    ↓
-Supabase PostgreSQL
-  - user_profiles (RLS-protected)
-  - playlists / videos / partitions / schedules
-  - achievements / activity_log / templates
-    ↓
-Repository Layer (type-safe CRUD)
-  PlaylistRepository | UserRepository | AchievementRepository
-```
-
-**Row-Level Security (RLS):** Every table enforces `user_id = auth.uid()` policies, ensuring strict data isolation.
-
-**Automated Triggers:** Profile auto-creation on signup; stat counters (`total_playlists_created`, `total_hours_planned`) updated via DB triggers.
-
-### Phase 3B — Premium UI & Dark Mode
-
-```
-next-themes ThemeProvider
-    ↓
-CSS custom properties (--background, --primary, etc.)
-    ↓
-Tailwind sidebar utilities (bg-sidebar, text-sidebar-foreground)
-    ↓
-Dark / Light / System toggle → persisted in user_profiles.theme_preference
-```
-
-Key additions:
-- `cmdk` — Cmd+K command palette
-- `framer-motion` — sidebar collapse, page transitions, counting numbers
-- `sonner` — toast notifications
-- `useViewStore` — persistent grid/list/compact view preferences
-
-### Phase 3C — Gamification & Progress
-
-```
-AchievementChecker (lib/achievements/checker.ts)
-    ↓
-Checks 12 achievement definitions against user stats
-    ↓
-pendingAchievements[] pushed into useSavedPlaylistStore
-    ↓
-GlobalAchievementNotifier polls store → triggers confetti modal
-```
-
-Leaderboard architecture:
-```
-Supabase materialized view (leaderboard_mv)
-    ↓
-LeaderboardRepository (opt-in, refresh)
-    ↓
-LeaderboardTable (tabbed: hours / streak / completion)
-```
-
-Progress components read directly from `user_profiles` via `UserRepository`.
-
-### Phase 3D — Analytics, Onboarding & Email
-
-```
-AnalyticsService (lib/analytics/service.ts)
-    ↓  queries: user_profiles + playlists + activity_log
-    ↓  computes: daily avg, productive day, speed distribution,
-    ↓            completion rate, streak history, monthly progress
-    ↓
-AnalyticsPage (server component)
-    ↓  fetches data, serialises to plain objects
-    ↓
-AnalyticsContent (client wrapper)
-    ↓  renders lucide icons + InsightCard + MonthlyProgressChart
-```
-
-> **Note:** The server → client split was required because lucide icon components
-> (functions) cannot be passed from Server Components to Client Components.
-> `AnalyticsContent.tsx` is a `'use client'` wrapper that owns the icons.
-
-Onboarding flow:
-```
-useOnboardingStore (zustand + persist)
-    ↓
-shepherd.js Tour (direct — replaces react-shepherd)
-    ↓
-5-step guided tour (auto-starts 1.5s after first login)
-    ↓
-completeOnboarding() → persisted to localStorage
-```
-
-Email system:
-```
-Resend SDK (lib/email/client.ts)
-    ↓
-@react-email templates (AchievementUnlocked, WeeklySummary)
-    ↓
-EmailService.sendAchievementUnlocked() | sendWeeklySummary() | sendStreakReminder()
-```
-
-## 🔮 Future Architecture Evolution
-
-### Phase 4: Ecosystem Expansion
-
-```
-Browser Extension → Shared API client
-Mobile Apps → Same backend API + Supabase Realtime
-Premium Features → Stripe integration
-AI Insights → OpenAI API for smart playlist categorisation
-```
-
-## 📝 Key Architectural Decisions
-
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **Monorepo Tool** | npm workspaces | Native, no external tools needed |
-| **Backend Framework** | Express | Mature, well-documented, flexible |
-| **Frontend Framework** | Next.js 14 | Best-in-class React framework, great DX |
-| **Styling** | Tailwind CSS | Rapid development, consistent design |
-| **State Management** | Zustand | Minimal boilerplate, hooks-based |
-| **Type System** | TypeScript | Catch errors early, better DX |
-| **Validation** | Zod | Type-safe runtime validation |
-| **Icons** | Lucide | Tree-shakeable, modern icons |
-| **Auth** | NextAuth.js v5 | Flexible OAuth, Supabase adapter |
-| **Database** | Supabase (PostgreSQL) | RLS, realtime, hosted |
-| **Email** | Resend + @react-email | Developer-friendly, React templates |
-| **Charts** | Recharts | Composable, SSR-safe |
-| **Onboarding** | shepherd.js (direct) | Avoids react-shepherd's bundled React conflicts with Next.js 14 |
-
-## 🎓 Learning Resources
-
-- **Express Best Practices:** https://expressjs.com/en/advanced/best-practice-performance.html
-- **Next.js Docs:** https://nextjs.org/docs
-- **YouTube Data API:** https://developers.google.com/youtube/v3
-- **TypeScript Handbook:** https://www.typescriptlang.org/docs/
-- **Supabase Docs:** https://supabase.com/docs
-- **NextAuth.js Docs:** https://authjs.dev
-- **Resend Docs:** https://resend.com/docs
-
----
-
-**This architecture is designed to grow with the product — Phases 1–3D (+ post-3D polish) complete, Phase 4 ready.**
+| Decision | Choice | Why |
+|---|---|---|
+| Separate backend | Express, not Next API routes | Keeps the YouTube key and quota logic out of the web tier; reusable by future clients |
+| Auth | Auth.js JWT + Google, no adapter | Simple; user rows created lazily by `syncUserToDatabase` |
+| DB access | Supabase as plain Postgres via anon key | Consequence: RLS disabled — see Known limitations |
+| Planner state | Client-side + base64 share links | No server storage needed for sharing |
+| State | Zustand | Minimal boilerplate, `persist` middleware |
+| Tour | `shepherd.js` directly | `react-shepherd` conflicted with Next 14 / React |
+| Validation | Zod | Runtime-typed query validation |

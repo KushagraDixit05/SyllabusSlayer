@@ -24,6 +24,9 @@ export interface Database {
           last_activity_date: string | null
           leaderboard_opt_in: boolean
           leaderboard_username: string | null
+          xp: number
+          total_hours_saved: number
+          speed_mastery_count: number
           created_at: string
           updated_at: string
         }
@@ -46,6 +49,9 @@ export interface Database {
           last_activity_date?: string | null
           leaderboard_opt_in?: boolean
           leaderboard_username?: string | null
+          xp?: number
+          total_hours_saved?: number
+          speed_mastery_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -68,6 +74,9 @@ export interface Database {
           last_activity_date?: string | null
           leaderboard_opt_in?: boolean
           leaderboard_username?: string | null
+          xp?: number
+          total_hours_saved?: number
+          speed_mastery_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -242,6 +251,32 @@ export interface Database {
           is_shared?: boolean
         }
       }
+      activity_log: {
+        Row: {
+          id: string
+          user_id: string
+          activity_type: string
+          activity_data: Record<string, any> | null
+          duration_seconds: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          activity_type: string
+          activity_data?: Record<string, any> | null
+          duration_seconds?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          activity_type?: string
+          activity_data?: Record<string, any> | null
+          duration_seconds?: number
+          created_at?: string
+        }
+      }
     }
   }
 }
@@ -263,3 +298,6 @@ export type AchievementInsert = Database['public']['Tables']['achievements']['In
 export type Partition = Database['public']['Tables']['partitions']['Row']
 export type PartitionInsert = Database['public']['Tables']['partitions']['Insert']
 export type PartitionUpdate = Database['public']['Tables']['partitions']['Update']
+
+export type ActivityLog = Database['public']['Tables']['activity_log']['Row']
+export type ActivityLogInsert = Database['public']['Tables']['activity_log']['Insert']

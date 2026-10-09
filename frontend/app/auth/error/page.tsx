@@ -4,6 +4,10 @@ import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Suspense } from "react"
+import { XCircle } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 const errorMessages: Record<string, string> = {
   Configuration: "There is a problem with the server configuration.",
@@ -24,44 +28,29 @@ function AuthErrorContent() {
   const message = errorMessages[error] || errorMessages.Default
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#09090b] px-4">
+    <div className="brutal-dots flex min-h-screen w-full items-center justify-center bg-background px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-[440px] flex flex-col items-center"
+        className="w-full max-w-[440px]"
       >
-        {/* Error icon */}
-        <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="rgb(239 68 68)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="15" y1="9" x2="9" y2="15" />
-            <line x1="9" y1="9" x2="15" y2="15" />
-          </svg>
-        </div>
+        <Card variant="elevated" className="flex flex-col items-center p-8">
+          <div className="rounded-full mb-6 flex h-12 w-12 items-center justify-center border-[3px] border-ink bg-destructive text-destructive-foreground">
+            <XCircle className="h-6 w-6" />
+          </div>
 
-        <h1 className="text-2xl font-bold text-white mb-3 text-center">
-          Authentication Error
-        </h1>
-        <p className="text-white/50 text-sm text-center mb-8 max-w-[320px]">
-          {message}
-        </p>
+          <h1 className="text-center font-display text-3xl font-black leading-none tracking-tight">
+            Authentication Error
+          </h1>
+          <p className="mb-8 mt-3 max-w-[320px] text-center text-sm font-medium text-muted-foreground">
+            {message}
+          </p>
 
-        <Link
-          href="/auth/signin"
-          className="h-[46px] px-8 flex items-center justify-center rounded-lg bg-white text-[#09090b] text-sm font-semibold transition-all duration-200 hover:bg-white/90 active:scale-[0.98]"
-        >
-          Try again
-        </Link>
+          <Button asChild size="lg">
+            <Link href="/auth/signin">Try again</Link>
+          </Button>
+        </Card>
       </motion.div>
     </div>
   )
@@ -69,7 +58,7 @@ function AuthErrorContent() {
 
 export default function AuthErrorPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#09090b]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <AuthErrorContent />
     </Suspense>
   )

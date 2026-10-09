@@ -1,37 +1,46 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LucideIcon } from 'lucide-react'
+
+import { cn } from '@/lib/utils'
+import { Card } from '@/components/ui/card'
+import { TONE_CLASSES, type StatTileTone } from '@/components/ui/stat-tile'
+
+export type InsightTone = StatTileTone
 
 interface InsightCardProps {
   title: string
   insight: string
   icon: LucideIcon
-  color?: string
+  tone?: InsightTone
 }
 
+/**
+ * Same chip/label/value anatomy as StatTile, but the value is a short phrase
+ * rather than a number, so it can't use CountingNumber.
+ */
 export function InsightCard({
   title,
   insight,
   icon: Icon,
-  color = 'hsl(var(--primary))',
+  tone = 'brand',
 }: InsightCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center space-x-2">
-          <div
-            className="rounded-full p-2"
-            style={{ backgroundColor: `${color}20` }}
-          >
-            <Icon className="h-5 w-5" style={{ color }} />
-          </div>
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    <Card variant="glass" className="p-6">
+      <div className="flex items-center gap-3">
+        <div
+          className={cn(
+            'flex h-10 w-10 shrink-0 items-center justify-center border-[3px] border-ink',
+            TONE_CLASSES[tone]
+          )}
+        >
+          <Icon className="h-5 w-5" />
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-bold">{insight}</p>
-      </CardContent>
+        <p className="text-xs font-bold text-muted-foreground">
+          {title}
+        </p>
+      </div>
+      <p className="mt-4 font-display text-2xl font-black leading-tight">{insight}</p>
     </Card>
   )
 }

@@ -53,7 +53,7 @@ export function ManualEntrySection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <Plus className="h-5 w-5 text-chart-3" />
             Add Single Video
           </CardTitle>
           <CardDescription>
@@ -94,7 +94,7 @@ export function ManualEntrySection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Upload className="h-5 w-5 text-foreground" />
             Bulk Entry
           </CardTitle>
           <CardDescription>
@@ -140,7 +140,7 @@ export function ManualEntrySection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ duration: 0.2 }}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-border/80 bg-card group"
+                    className="rounded-lg group flex items-center gap-3 border-[3px] border-ink bg-card p-3"
                   >
                     <GripVertical className="h-5 w-5 text-muted-foreground" />
                     <div className="flex-1 min-w-0">
@@ -153,7 +153,7 @@ export function ManualEntrySection() {
                       onClick={() => removeVideo(video.id)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </motion.div>
                 ))}

@@ -3,137 +3,147 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { UserMenu } from '@/components/auth/UserMenu'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Search, Bell } from 'lucide-react'
-import { FaBars, FaTimes } from 'react-icons/fa'
+import { StreakFlame } from '@/components/gamification/StreakFlame'
+import { Search, Bell, Menu, X } from 'lucide-react'
+import { levelForXp } from '@/lib/gamification/xpCurve'
+import { useCommandMenuStore } from '@/store/useCommandMenuStore'
+import { useSavedPlaylistStore } from '@/store/useSavedPlaylistStore'
 
 interface DashboardHeaderProps {
   currentStreak?: number
   hoursSaved?: number
+  xp?: number
 }
 
-export function DashboardHeader({ currentStreak = 0, hoursSaved = 0 }: DashboardHeaderProps) {
+export function DashboardHeader({ currentStreak = 0, hoursSaved = 0, xp = 0 }: DashboardHeaderProps) {
   const { data: session } = useSession()
-  const [pageScroll, setPageScroll] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const level = levelForXp(xp)
 
-  useEffect(() => {
-    const handleScroll = () => setPageScroll(window.scrollY >= 90)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const openCommandMenu = useCommandMenuStore((s) => s.setOpen)
+
+  // Real pending count, replacing a hardcoded `3`. Read after mount so the
+  // server and client markup agree.
+  const pendingAchievements = useSavedPlaylistStore((s) => s.pendingAchievements)
+  const pendingMilestones = useSavedPlaylistStore((s) => s.pendingMilestones)
+  const pendingCount = mounted
+    ? pendingAchievements.length + pendingMilestones.length
+    : 0
+
+  useEffect(() => setMounted(true), [])
+
+  const notificationBell = (
+    <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+      <Bell className="h-5 w-5" />
+      {pendingCount > 0 && (
+        <span className="rounded-full absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center border-[3px] border-ink bg-destructive font-mono text-[10px] font-bold text-destructive-foreground">
+          {pendingCount}
+        </span>
+      )}
+    </Button>
+  )
 
   return (
-    <div
-      className={`w-full h-16 z-10 bg-black text-white duration-300 ease-in transition-all ${pageScroll ? 'backdrop-blur-md bg-black/80' : ''
-        }`}
-    >
-      <div className="flex justify-between items-center w-full h-full mx-auto px-6">
+    <div className="z-10 h-16 w-full shrink-0 border-b-[3px] border-ink bg-background">
+      <div className="mx-auto flex h-full w-full items-center justify-between px-6">
         {/* Left: Search */}
-        <div className="flex items-center flex-1">
+        <div className="flex flex-1 items-center">
           <Button
             variant="outline"
-            className="w-64 justify-start bg-white/10 border-white/20 text-white/70 hover:bg-white/20 hover:text-white"
+            onClick={() => openCommandMenu(true)}
+            className="w-64 justify-start text-muted-foreground"
           >
             <Search className="mr-2 h-4 w-4" />
             Search...
-            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-white/20 bg-white/10 px-1.5 font-mono text-[10px] font-medium text-white/50">
+            <kbd className="rounded-md pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 border-[3px] border-ink bg-muted px-1.5 font-mono text-[10px] font-bold text-muted-foreground">
               ⌘K
             </kbd>
           </Button>
         </div>
 
         {/* Right: desktop actions */}
-        <div className="hidden md:flex items-center space-x-4">
-          {/* Quick Stats */}
-          <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <span className="text-white/60">Streak:</span>
-              <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                {currentStreak} days 🔥
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-white/60">Hours saved:</span>
-              <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                {hoursSaved}h
-              </Badge>
-            </div>
+        <div className="hidden items-center space-x-4 md:flex">
+          <div className="flex items-center space-x-3">
+            <Badge variant="flame" className="gap-1">
+              <StreakFlame days={currentStreak} compact iconClassName="h-3.5 w-3.5" />
+            </Badge>
+            <Badge className="gap-1">
+              Lvl {level} &middot; {xp.toLocaleString()} XP
+            </Badge>
+            <span className="text-xs font-bold text-muted-foreground">
+              {hoursSaved}h saved
+            </span>
           </div>
 
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              3
-            </span>
-          </Button>
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
-
-          {/* User Menu */}
+          {notificationBell}
           {session && <UserMenu session={session} />}
         </div>
 
         {/* Mobile: hamburger */}
         {!mobileOpen && (
-          <div className="md:hidden cursor-pointer" onClick={() => setMobileOpen(true)}>
-            <FaBars size={24} />
-          </div>
+          <button
+            type="button"
+            aria-label="Open menu"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
         )}
       </div>
 
       {/* Mobile overlay */}
-      <div
-        className={
-          mobileOpen
-            ? 'md:hidden fixed left-0 top-0 w-full h-full bg-black/70 backdrop-blur z-40'
-            : ''
-        }
-        onClick={() => setMobileOpen(false)}
-      />
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-ink/40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* Mobile drawer */}
       <div
-        className={`fixed top-0 ${mobileOpen ? 'left-0' : 'left-[-100%]'
-          } w-4/5 h-full bg-gradient-to-b from-gray-900 to-black text-white p-10 ease-in duration-300 z-50 flex flex-col gap-8`}
+        className={`fixed top-0 ${
+          mobileOpen ? 'left-0' : 'left-[-100%]'
+        } z-50 flex h-full w-4/5 flex-col gap-8 border-r-[3px] border-ink bg-card p-10 duration-300 ease-in`}
       >
-        {/* Drawer header */}
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-bold tracking-wider uppercase">Menu</span>
-          <div className="p-2 cursor-pointer hover:text-white/70 transition-colors" onClick={() => setMobileOpen(false)}>
-            <FaTimes size={24} />
-          </div>
+        <div className="flex items-center justify-between border-b-[3px] border-ink pb-4">
+          <span className="font-display text-xl font-black tracking-tight">Menu</span>
+          <button type="button" aria-label="Close menu" onClick={() => setMobileOpen(false)}>
+            <X className="h-6 w-6" />
+          </button>
         </div>
 
-        {/* Mobile Stats */}
-        <div className="flex flex-col gap-4 text-sm">
-          <div className="flex items-center justify-between border border-white/10 rounded-lg p-3">
-            <span className="text-white/60">Streak</span>
-            <Badge variant="secondary" className="bg-white/10 text-white">{currentStreak} days 🔥</Badge>
-          </div>
-          <div className="flex items-center justify-between border border-white/10 rounded-lg p-3">
-            <span className="text-white/60">Hours saved</span>
-            <Badge variant="secondary" className="bg-white/10 text-white">{hoursSaved}h</Badge>
-          </div>
-        </div>
-
-        {/* Mobile actions */}
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          {session && <UserMenu session={session} />}
-          <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              3
+        <div className="flex flex-col gap-4">
+          <div className="rounded-lg flex items-center justify-between border-[3px] border-ink p-3">
+            <span className="text-xs font-bold text-muted-foreground">
+              Streak
             </span>
-          </Button>
+            <Badge variant="flame">
+              <StreakFlame days={currentStreak} compact iconClassName="h-3.5 w-3.5" />
+            </Badge>
+          </div>
+          <div className="rounded-lg flex items-center justify-between border-[3px] border-ink p-3">
+            <span className="text-xs font-bold text-muted-foreground">
+              Level
+            </span>
+            <Badge>Lvl {level} &middot; {xp.toLocaleString()} XP</Badge>
+          </div>
+          <div className="rounded-lg flex items-center justify-between border-[3px] border-ink p-3">
+            <span className="text-xs font-bold text-muted-foreground">
+              Hours saved
+            </span>
+            <Badge variant="secondary">{hoursSaved}h</Badge>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {session && <UserMenu session={session} />}
+          {notificationBell}
         </div>
       </div>
     </div>
   )
 }
-

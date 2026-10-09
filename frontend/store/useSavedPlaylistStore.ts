@@ -6,9 +6,13 @@
 import { create } from 'zustand'
 import { playlistRepository } from '@/lib/repositories/playlistRepository'
 import { userRepository } from '@/lib/repositories/userRepository'
+import { activityRepository } from '@/lib/repositories/activityRepository'
 import { achievementChecker } from '@/lib/achievements/checker'
+import { checkMilestone, type Milestone } from '@/lib/milestones/checker'
 import type { AchievementDefinition } from '@/lib/achievements/definitions'
 import type { Playlist, Video } from '@/types/database'
+
+const MILESTONE_XP = 15
 
 interface SavedPlaylistState {
   // Database-synced playlists
@@ -25,6 +29,10 @@ interface SavedPlaylistState {
   pendingAchievements: AchievementDefinition[]
   dismissAchievement: () => void
 
+  // Milestone notifications
+  pendingMilestones: Milestone[]
+  dismissMilestone: () => void
+
   // Actions - Database operations
   loadUserPlaylists: (userId: string) => Promise<void>
   loadPlaylist: (playlistId: string) => Promise<void>
@@ -32,7 +40,7 @@ interface SavedPlaylistState {
   deletePlaylist: (playlistId: string) => Promise<void>
   updatePlaylistProgress: (playlistId: string, percentage: number) => Promise<void>
   markPlaylistComplete: (playlistId: string, userId?: string) => Promise<void>
-  toggleVideoCompletion: (videoId: string, playlistId: string, isCompleted: boolean) => Promise<void>
+  toggleVideoCompletion: (videoId: string, playlistId: string, isCompleted: boolean, userId?: string) => Promise<void>
 
   // Actions - Local state
   setCurrentPlaylist: (playlist: Playlist | null) => void
@@ -49,9 +57,13 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
   isSaving: false,
   error: null,
   pendingAchievements: [],
+  pendingMilestones: [],
 
   dismissAchievement: () =>
     set((state) => ({ pendingAchievements: state.pendingAchievements.slice(1) })),
+
+  dismissMilestone: () =>
+    set((state) => ({ pendingMilestones: state.pendingMilestones.slice(1) })),
 
   loadUserPlaylists: async (userId: string) => {
     set({ isLoading: true, error: null })
@@ -104,16 +116,47 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
           isSaving: false,
         }))
 
-        // Update user stats
-        const hoursPlanned = Math.floor((playlistData.total_duration || 0) / 3600)
-        await userRepository.incrementPlaylistStats(userId, hoursPlanned)
+        // Stats, activity and achievements are best-effort: the playlist is already
+        // saved, so a failure here must not make the caller report the save as failed.
+        try {
+          const profileBefore = await userRepository.getProfile(userId)
+          const hoursPlanned = Math.floor((playlistData.total_duration || 0) / 3600)
+          await userRepository.incrementPlaylistStats(userId, hoursPlanned)
+          await activityRepository.logActivity(userId, 'playlist_created', {
+            durationSeconds: playlistData.total_duration,
+            data: { playlist_id: result.playlist.id },
+          })
 
-        // Check for new achievements
-        const newAchievements = await achievementChecker.checkAfterPlaylistCreated(userId)
-        if (newAchievements.length > 0) {
-          set((state) => ({
-            pendingAchievements: [...state.pendingAchievements, ...newAchievements],
-          }))
+          // Check for new achievements
+          const newAchievements = await achievementChecker.checkAfterPlaylistCreated(userId)
+          if (newAchievements.length > 0) {
+            set((state) => ({
+              pendingAchievements: [...state.pendingAchievements, ...newAchievements],
+            }))
+          }
+
+          // Check for new milestones
+          if (profileBefore) {
+            const milestone =
+              checkMilestone(
+                'playlists',
+                (profileBefore.total_playlists_created || 0) + 1,
+                profileBefore.total_playlists_created || 0
+              ) ||
+              checkMilestone(
+                'hours',
+                (profileBefore.total_hours_planned || 0) + hoursPlanned,
+                profileBefore.total_hours_planned || 0
+              )
+            if (milestone) {
+              await userRepository.addXp(userId, MILESTONE_XP)
+              set((state) => ({
+                pendingMilestones: [...state.pendingMilestones, milestone],
+              }))
+            }
+          }
+        } catch (sideEffectError) {
+          console.error('Playlist saved, but post-save updates failed:', sideEffectError)
         }
 
         return result.playlist
@@ -182,12 +225,30 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
       }))
       // Check for new achievements after completion
       if (userId) {
+        const profileBefore = await userRepository.getProfile(userId)
         await userRepository.incrementCompletedStats(userId, 0)
+        await activityRepository.logActivity(userId, 'playlist_completed', {
+          data: { playlist_id: playlistId },
+        })
         const newAchievements = await achievementChecker.checkAfterPlaylistCompleted(userId)
         if (newAchievements.length > 0) {
           set((state) => ({
             pendingAchievements: [...state.pendingAchievements, ...newAchievements],
           }))
+        }
+
+        if (profileBefore) {
+          const milestone = checkMilestone(
+            'playlists',
+            (profileBefore.total_playlists_completed || 0) + 1,
+            profileBefore.total_playlists_completed || 0
+          )
+          if (milestone) {
+            await userRepository.addXp(userId, MILESTONE_XP)
+            set((state) => ({
+              pendingMilestones: [...state.pendingMilestones, milestone],
+            }))
+          }
         }
       }
     } catch (error) {
@@ -200,7 +261,7 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
   clearCurrent: () => set({ currentPlaylist: null, currentVideos: [] }),
   clearError: () => set({ error: null }),
 
-  toggleVideoCompletion: async (videoId: string, playlistId: string, isCompleted: boolean) => {
+  toggleVideoCompletion: async (videoId: string, playlistId: string, isCompleted: boolean, userId?: string) => {
     try {
       const updatedVideo = await playlistRepository.toggleVideoCompletion(videoId, isCompleted)
       if (!updatedVideo) {
@@ -214,6 +275,13 @@ export const useSavedPlaylistStore = create<SavedPlaylistState>((set) => ({
         v.id === videoId ? { ...v, is_completed: isCompleted, completed_at: isCompleted ? new Date().toISOString() : null } : v
       )
       set({ currentVideos: updatedVideos })
+
+      if (isCompleted && userId) {
+        await activityRepository.logActivity(userId, 'video_completed', {
+          durationSeconds: updatedVideo.duration,
+          data: { video_id: videoId, playlist_id: playlistId },
+        })
+      }
 
       // Recalculate and persist playlist progress
       const totalVideos = updatedVideos.length

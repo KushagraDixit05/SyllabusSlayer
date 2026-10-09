@@ -35,17 +35,14 @@ export class UserRepository {
     return data
   }
 
-  async updateStreak(userId: string, newStreak: number): Promise<void> {
+  async addXp(userId: string, amount: number): Promise<void> {
+    if (amount <= 0) return
     const profile = await this.getProfile(userId)
     if (!profile) return
 
-    const updates: UserProfileUpdate = {
-      current_streak: newStreak,
-      longest_streak: Math.max(profile.longest_streak || 0, newStreak),
-      last_activity_date: new Date().toISOString().split('T')[0],
-    }
-
-    await this.updateProfile(userId, updates)
+    await this.updateProfile(userId, {
+      xp: (profile.xp || 0) + amount,
+    })
   }
 
   async incrementPlaylistStats(userId: string, hoursPlanned: number): Promise<void> {

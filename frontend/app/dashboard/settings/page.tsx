@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { Bell, Mail, Shield, Palette, Sun, Moon, Monitor } from 'lucide-react'
+import { Bell, Mail, Shield, Palette, Sun } from 'lucide-react'
 
 interface EmailPreferences {
   achievementEmails: boolean
@@ -17,7 +16,6 @@ interface EmailPreferences {
 }
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme()
   const [emailPrefs, setEmailPrefs] = useState<EmailPreferences>({
     achievementEmails: true,
     weeklySummary: true,
@@ -46,7 +44,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="font-display text-4xl font-black tracking-tight md:text-5xl">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your account preferences</p>
       </div>
 
@@ -54,7 +52,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Mail className="h-5 w-5 text-primary" />
+            <Mail className="h-5 w-5 text-foreground" />
             <CardTitle>Email Notifications</CardTitle>
           </div>
           <CardDescription>
@@ -114,7 +112,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Bell className="h-5 w-5 text-primary" />
+            <Bell className="h-5 w-5 text-foreground" />
             <CardTitle>In-App Notifications</CardTitle>
           </div>
           <CardDescription>Control in-app notification behavior</CardDescription>
@@ -148,7 +146,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Palette className="h-5 w-5 text-primary" />
+            <Palette className="h-5 w-5 text-foreground" />
             <CardTitle>Appearance</CardTitle>
           </div>
           <CardDescription>Customize the look and feel</CardDescription>
@@ -156,50 +154,17 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <Label className="text-base">Theme</Label>
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => setTheme('light')}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                  theme === 'light' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-              >
-                <Sun className={`h-5 w-5 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`}>
-                  Light
-                </span>
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                  theme === 'dark' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-              >
-                <Moon className={`h-5 w-5 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`}>
-                  Dark
-                </span>
-              </button>
-              <button
-                onClick={() => setTheme('system')}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                  theme === 'system' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-              >
-                <Monitor className={`h-5 w-5 ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`text-sm font-medium ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`}>
-                  System
-                </span>
-              </button>
+            <div className="flex items-center gap-3 rounded-lg border-[3px] border-ink bg-card p-4 shadow-brutal-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] border-ink bg-primary">
+                <Sun className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold">Light</p>
+                <p className="text-xs text-muted-foreground">
+                  SyllabusSlayer uses a single light theme.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              System theme follows your device&apos;s appearance settings
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -208,7 +173,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Shield className="h-5 w-5 text-primary" />
+            <Shield className="h-5 w-5 text-foreground" />
             <CardTitle>Privacy</CardTitle>
           </div>
           <CardDescription>Manage your data and privacy settings</CardDescription>

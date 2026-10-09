@@ -64,7 +64,7 @@ export function ScheduleCalculator() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Calendar className="h-5 w-5 text-foreground" />
             Schedule Calculator
           </CardTitle>
           <CardDescription>
@@ -130,18 +130,18 @@ export function ScheduleCalculator() {
                   key={day.id}
                   onClick={() => toggleRestDay(day.id)}
                   className={`
-                    flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
+                    flex flex-col items-center justify-center border-[3px] border-ink p-3 transition-all
                     ${restDays.includes(day.id)
-                      ? 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-800 text-red-700 dark:text-red-400'
-                      : 'bg-card border-border hover:border-border/80'
+                      ? 'bg-destructive text-destructive-foreground shadow-brutal-sm'
+                      : 'bg-card hover:bg-accent'
                     }
                   `}
                 >
-                  <span className="text-xs font-medium">{day.short}</span>
+                  <span className="text-xs font-bold">{day.short}</span>
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Click days to mark as rest days</p>
+            <p className="text-sm font-medium text-muted-foreground">Click days to mark as rest days</p>
           </div>
         </CardContent>
       </Card>
@@ -152,10 +152,10 @@ export function ScheduleCalculator() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-2 border-border bg-muted">
+          <Card variant="elevated" className="bg-muted">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Sparkles className="h-5 w-5 text-foreground" />
                 Your Completion Timeline
               </CardTitle>
             </CardHeader>
@@ -163,28 +163,28 @@ export function ScheduleCalculator() {
               {/* Hero Stats */}
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Target Completion</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="mb-1 text-xs font-bold text-muted-foreground">Target Completion</p>
+                  <p className="font-display text-2xl font-black tabular-nums text-foreground">
                     {format(schedule.endDate, 'MMM dd, yyyy')}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Days Required</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="mb-1 text-xs font-bold text-muted-foreground">Days Required</p>
+                  <p className="font-display text-2xl font-black tabular-nums text-foreground">
                     {schedule.totalDays}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Total Study Time</p>
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  <p className="mb-1 text-xs font-bold text-muted-foreground">Total Study Time</p>
+                  <p className="font-display text-2xl font-black tabular-nums text-foreground">
                     {totalHours}h {totalMinutes}m
                   </p>
                 </div>
               </div>
 
               {/* Motivational Message */}
-              <div className="rounded-lg bg-card/80 p-4 border border-border">
-                <p className="text-center text-muted-foreground italic">
+              <div className="rounded-lg border-[3px] border-ink bg-card p-4">
+                <p className="text-center text-sm font-medium text-muted-foreground">
                   💪 Consistency is key to mastering this content!
                 </p>
               </div>
@@ -192,7 +192,7 @@ export function ScheduleCalculator() {
               {/* Daily Breakdown */}
               {schedule.dailySchedule.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-foreground">Daily Breakdown</h3>
+                  <h3 className="font-display text-base font-black tracking-tight">Daily Breakdown</h3>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {schedule.dailySchedule.slice(0, 14).map((day, index) => (
                       <motion.div
@@ -200,7 +200,7 @@ export function ScheduleCalculator() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.03 }}
-                        className="flex items-center gap-4 p-3 rounded-lg bg-card border border-border"
+                        className="rounded-lg flex items-center gap-4 border-[3px] border-ink bg-card p-3"
                       >
                         <div className="min-w-[100px]">
                           <p className="text-sm font-medium">{format(day.date, 'EEE, MMM dd')}</p>

@@ -1,7 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
+import { StreakFlame } from '@/components/gamification/StreakFlame'
+import { cn } from '@/lib/utils'
 
 interface StreakDisplayProps {
   currentStreak: number
@@ -9,21 +10,19 @@ interface StreakDisplayProps {
 }
 
 export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayProps) {
+  const active = currentStreak > 0
+
+  // One surface regardless of state — the streak is expressed in the fill,
+  // not by swapping the card variant.
   return (
-    <Card>
+    <Card variant="glass" className={cn(active && 'flame-glow')}>
       <CardContent className="p-6">
         <div className="flex items-center space-x-4">
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="text-5xl select-none"
-          >
-            🔥
-          </motion.div>
+          <StreakFlame days={currentStreak} compact className="text-5xl" iconClassName="h-12 w-12" />
 
           <div className="flex-1">
             <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-bold">{currentStreak}</span>
+              <span className="font-display text-4xl font-black tabular-nums">{currentStreak}</span>
               <span className="text-muted-foreground">day streak</span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
@@ -37,9 +36,10 @@ export function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayPro
           {[7, 30, 100].map((milestone) => (
             <div
               key={milestone}
-              className={`flex-1 h-2 rounded-full transition-colors ${
-                currentStreak >= milestone ? 'bg-orange-500' : 'bg-muted'
-              }`}
+              className={cn(
+                'h-3 flex-1 border-[3px] border-ink transition-colors',
+                currentStreak >= milestone ? 'bg-flame-from' : 'bg-muted'
+              )}
             />
           ))}
         </div>

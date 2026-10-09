@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export function PartitionControls() {
   const { totalDuration, partitions, createPartitionsFromConfig, partitionConfig } = usePlannerStore();
@@ -36,7 +37,7 @@ export function PartitionControls() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          <Sparkles className="h-5 w-5 text-rarity-epic" />
           Partition Your Study Plan
         </CardTitle>
         <CardDescription>
@@ -46,19 +47,27 @@ export function PartitionControls() {
       <CardContent className="space-y-6">
         {/* Session Length Presets */}
         <div className="space-y-3">
-          <Label>Session Length Presets</Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {PARTITION_PRESETS.map((preset) => (
-              <Button
-                key={preset.minutes}
-                variant={sessionLength === preset.minutes ? 'default' : 'outline'}
-                onClick={() => handlePresetClick(preset.minutes)}
-                className="flex flex-col h-auto py-3"
-              >
-                <span className="text-lg font-bold">{preset.minutes} min</span>
-                <span className="text-xs opacity-75">{preset.label}</span>
-              </Button>
-            ))}
+          <Label className="text-xs font-bold text-muted-foreground">
+            Session Length Presets
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            {PARTITION_PRESETS.map((preset) => {
+              const isActive = sessionLength === preset.minutes;
+              return (
+                <Button
+                  key={preset.minutes}
+                  variant="outline"
+                  onClick={() => handlePresetClick(preset.minutes)}
+                  className={cn(
+                    'flex flex-col h-auto py-3',
+                    isActive && 'border-primary bg-primary/10 text-foreground hover:text-foreground'
+                  )}
+                >
+                  <span className="text-lg font-bold">{preset.minutes} min</span>
+                  <span className="text-xs opacity-75">{preset.label}</span>
+                </Button>
+              );
+            })}
           </div>
         </div>
 
@@ -121,9 +130,11 @@ export function PartitionControls() {
           className="rounded-lg bg-muted p-4 border border-border"
         >
           <div className="flex items-center gap-3">
-            <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <Clock className="h-8 w-8 text-foreground" />
             <div>
-              <p className="text-sm text-muted-foreground">Estimated Study Sessions</p>
+              <p className="text-xs font-bold text-muted-foreground">
+                Estimated Study Sessions
+              </p>
               <p className="text-2xl font-bold text-foreground">{estimatedSessions}</p>
             </div>
           </div>

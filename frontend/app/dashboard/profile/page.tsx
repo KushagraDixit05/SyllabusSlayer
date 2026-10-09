@@ -2,18 +2,26 @@ import { auth } from '@/lib/auth'
 import { userRepository } from '@/lib/repositories/userRepository'
 import { playlistRepository } from '@/lib/repositories/playlistRepository'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { StatTile } from '@/components/ui/stat-tile'
+import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { xpForNextLevel, levelForXp } from '@/lib/gamification/xpCurve'
+import { cn } from '@/lib/utils'
 import {
     BookOpen,
     CheckCircle2,
     Clock,
     Flame,
     Trophy,
-    Calendar,
     Mail,
+    Settings,
+    PlayCircle,
 } from 'lucide-react'
 
 export default async function ProfilePage() {
@@ -26,66 +34,75 @@ export default async function ProfilePage() {
     ])
 
     const completedPlaylists = allPlaylists.filter((p) => p.status === 'completed').length
-    const activePlaylists = allPlaylists.filter((p) => p.status !== 'completed').length
+    const activePlaylists = allPlaylists.filter((p) => p.status === 'in_progress').length
+
+    const xp = userProfile?.xp ?? 0
+    const level = levelForXp(xp)
+    const { current, needed } = xpForNextLevel(xp)
+    const xpProgress = needed > 0 ? Math.min(100, Math.round((current / needed) * 100)) : 100
 
     const stats = [
         {
             label: 'Total Playlists',
             value: userProfile?.total_playlists_created || 0,
             icon: BookOpen,
-            color: 'text-blue-500',
+            tone: 'brand' as const,
         },
         {
             label: 'Completed',
             value: completedPlaylists,
             icon: CheckCircle2,
-            color: 'text-green-500',
+            tone: 'success' as const,
         },
         {
             label: 'Hours Learned',
-            value: userProfile?.total_hours_completed || 0,
+            value: Math.round((userProfile?.total_hours_completed || 0) * 10) / 10,
             icon: Clock,
-            color: 'text-purple-500',
+            tone: 'rare' as const,
         },
         {
             label: 'Current Streak',
-            value: `${userProfile?.current_streak || 0} days`,
+            value: userProfile?.current_streak || 0,
+            suffix: ' days',
             icon: Flame,
-            color: 'text-orange-500',
+            tone: 'flame' as const,
+            highlight: true,
         },
         {
             label: 'Longest Streak',
-            value: `${userProfile?.longest_streak || 0} days`,
+            value: userProfile?.longest_streak || 0,
+            suffix: ' days',
             icon: Trophy,
-            color: 'text-yellow-500',
+            tone: 'flame' as const,
         },
         {
             label: 'Active Playlists',
             value: activePlaylists,
-            icon: Calendar,
-            color: 'text-cyan-500',
+            icon: PlayCircle,
+            tone: 'brand' as const,
         },
     ]
 
     return (
         <div className="space-y-6 max-w-3xl mx-auto">
-            <div>
-                <h1 className="text-3xl font-bold">Profile</h1>
-                <p className="text-muted-foreground mt-1">Your learning profile and stats</p>
-            </div>
+            <PageHeader
+                eyebrow="Operator"
+                title="Profile"
+                description="Your learning profile and stats"
+            />
 
             {/* User Info Card */}
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="flex items-center gap-6">
+            <Card variant="elevated" className="overflow-hidden">
+                <CardContent className="flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-5">
                         <Avatar className="h-20 w-20">
                             <AvatarImage src={session.user.image || undefined} alt={session.user.name || ''} />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl">
+                            <AvatarFallback className="bg-primary font-display text-2xl font-black text-primary-foreground">
                                 {session.user.name?.charAt(0).toUpperCase() || 'U'}
                             </AvatarFallback>
                         </Avatar>
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-bold">
+                            <h2 className="font-display text-2xl font-black tracking-tight">
                                 {userProfile?.display_name || session.user.name}
                             </h2>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -93,10 +110,10 @@ export default async function ProfilePage() {
                                 {session.user.email}
                             </div>
                             {userProfile?.bio && (
-                                <p className="text-sm text-muted-foreground mt-2">{userProfile.bio}</p>
+                                <p className="text-sm text-muted-foreground mt-2 max-w-md">{userProfile.bio}</p>
                             )}
-                            <div className="flex items-center gap-2 mt-2">
-                                {userProfile?.leaderboard_opt_in && (
+                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                {userProfile?.leaderboard_opt_in && userProfile.leaderboard_username && (
                                     <Badge variant="secondary">
                                         🏆 Leaderboard: {userProfile.leaderboard_username}
                                     </Badge>
@@ -111,55 +128,89 @@ export default async function ProfilePage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Progression panel */}
+                    <div className="rounded-lg w-full shrink-0 border-[3px] border-ink bg-background p-4 sm:w-64">
+                        <div className="mb-2 flex items-center justify-between">
+                            <p className="text-xs font-bold text-muted-foreground">
+                                Progression
+                            </p>
+                            <Badge>Lvl {level}</Badge>
+                        </div>
+                        <Progress value={xpProgress} />
+                        <div className="mt-2 flex items-center justify-between text-sm font-medium text-muted-foreground">
+                            <span>
+                                {current.toLocaleString()} / {needed.toLocaleString()} XP
+                            </span>
+                            <span>to level {level + 1}</span>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
             {/* Stats Grid */}
             <div>
-                <h3 className="text-lg font-semibold mb-4">Your Stats</h3>
+                <h3 className="mb-4 border-b-[3px] border-ink pb-2 font-display text-xl font-black tracking-tight">Your Stats</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {stats.map((stat) => (
-                        <Card key={stat.label}>
-                            <CardContent className="pt-6 pb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg bg-muted ${stat.color}`}>
-                                        <stat.icon className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold">{stat.value}</p>
-                                        <p className="text-xs text-muted-foreground">{stat.label}</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <StatTile
+                            key={stat.label}
+                            label={stat.label}
+                            value={stat.value}
+                            suffix={stat.suffix}
+                            icon={stat.icon}
+                            tone={stat.tone}
+                            glow={stat.highlight}
+                        />
                     ))}
                 </div>
             </div>
 
             {/* Preferences */}
             <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Preferences</CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Preferences</CardTitle>
+                    <Button asChild variant="outline" size="sm">
+                        <Link href="/dashboard/settings">
+                            <Settings className="mr-2 h-3.5 w-3.5" />
+                            Edit in Settings
+                        </Link>
+                    </Button>
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Preferred Speed</span>
-                        <span className="font-medium">{userProfile?.preferred_speed || 1}×</span>
+                        <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-xs font-medium">
+                            {userProfile?.preferred_speed || 1}×
+                        </span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Theme</span>
-                        <span className="font-medium capitalize">{userProfile?.theme_preference || 'system'}</span>
+                        <span className="flex items-center gap-1.5 font-medium capitalize">
+                            <span className="rounded-full h-2 w-2 border-[3px] border-ink bg-primary" />
+                            {userProfile?.theme_preference || 'system'}
+                        </span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Timezone</span>
-                        <span className="font-medium">{userProfile?.timezone || 'UTC'}</span>
+                        <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-xs font-medium">
+                            {userProfile?.timezone || 'UTC'}
+                        </span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Email Notifications</span>
-                        <Badge variant={userProfile?.email_notifications ? 'default' : 'secondary'}>
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                userProfile?.email_notifications
+                                    ? 'border-chart-5/40 bg-chart-5/15 text-chart-5'
+                                    : 'text-muted-foreground'
+                            )}
+                        >
+                            <span className={cn('mr-1.5 h-2 w-2 border-[3px] border-ink', userProfile?.email_notifications ? 'bg-chart-3' : 'bg-muted-foreground')} />
                             {userProfile?.email_notifications ? 'Enabled' : 'Disabled'}
                         </Badge>
                     </div>

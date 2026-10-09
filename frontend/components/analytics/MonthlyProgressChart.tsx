@@ -15,10 +15,17 @@ interface MonthlyProgressChartProps {
   data: Array<{ month: string; playlists: number; hours: number }>
 }
 
+const tooltipStyle = {
+  backgroundColor: 'hsl(var(--card))',
+  border: '3px solid hsl(var(--ink))',
+  borderRadius: 0,
+  fontSize: 12,
+}
+
 export function MonthlyProgressChart({ data }: MonthlyProgressChartProps) {
   if (data.length === 0) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Monthly Progress</CardTitle>
         </CardHeader>
@@ -32,7 +39,7 @@ export function MonthlyProgressChart({ data }: MonthlyProgressChartProps) {
   }
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle>Monthly Progress</CardTitle>
       </CardHeader>
@@ -50,6 +57,7 @@ export function MonthlyProgressChart({ data }: MonthlyProgressChartProps) {
             />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
+              contentStyle={tooltipStyle}
               labelFormatter={(label) => {
                 const [year, month] = String(label ?? '').split('-')
                 if (!year || !month) return label
@@ -62,18 +70,18 @@ export function MonthlyProgressChart({ data }: MonthlyProgressChartProps) {
               type="monotone"
               dataKey="playlists"
               name="Playlists"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              dot={{ r: 4 }}
+              stroke="hsl(var(--chart-1))"
+              strokeWidth={3}
+              dot={{ r: 4, strokeWidth: 3 }}
               activeDot={{ r: 6 }}
             />
             <Line
               type="monotone"
               dataKey="hours"
               name="Hours"
-              stroke="hsl(var(--chart-2, 220 70% 50%))"
-              strokeWidth={2}
-              dot={{ r: 4 }}
+              stroke="hsl(var(--chart-2))"
+              strokeWidth={3}
+              dot={{ r: 4, strokeWidth: 3 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>

@@ -41,7 +41,7 @@ export function SessionCheckIn({ partition, onComplete }: SessionCheckInProps) {
               disabled={isCompleting || partition.is_completed}
             />
             <div>
-              <h4 className="font-medium">Session {partition.session_number}</h4>
+              <h4 className="font-display text-sm font-black">Session {partition.session_number}</h4>
               <p className="text-sm text-muted-foreground">
                 Videos {partition.start_video_index + 1}–{partition.end_video_index + 1}
                 {' • '}
@@ -51,7 +51,7 @@ export function SessionCheckIn({ partition, onComplete }: SessionCheckInProps) {
           </div>
 
           {partition.is_completed && (
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <CheckCircle2 className="h-5 w-5 text-chart-3" />
           )}
         </div>
       </CardContent>

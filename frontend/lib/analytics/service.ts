@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { levelForXp, xpForNextLevel } from '@/lib/gamification/xpCurve'
 
 export interface UserAnalytics {
   totalPlaylists: number
@@ -18,6 +19,11 @@ export interface UserAnalytics {
   }
   categoryBreakdown: Array<{ category: string; count: number }>
   monthlyProgress: Array<{ month: string; playlists: number; hours: number }>
+  xp: number
+  level: number
+  xpToNextLevel: { current: number; needed: number; progress: number }
+  hoursSaved: number
+  speedMasteryCount: number
 }
 
 export class AnalyticsService {
@@ -64,6 +70,11 @@ export class AnalyticsService {
         },
         categoryBreakdown: this.categorizePlaylists(playlists || []),
         monthlyProgress: this.getMonthlyProgress(playlists || []),
+        xp: profile.xp || 0,
+        level: levelForXp(profile.xp || 0),
+        xpToNextLevel: xpForNextLevel(profile.xp || 0),
+        hoursSaved: profile.total_hours_saved || 0,
+        speedMasteryCount: profile.speed_mastery_count || 0,
       }
 
       return analytics

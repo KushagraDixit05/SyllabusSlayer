@@ -41,11 +41,13 @@ export function ActivityHeatmap({ activities, weeks = 12 }: ActivityHeatmapProps
     return data
   }, [activities, weeks])
 
+  // Opacity steps on one token rather than a raw green ramp, so the scale
+  // follows a retheme and reads the same in both modes.
   const getColor = (count: number) => {
     if (count === 0) return 'bg-muted'
-    if (count === 1) return 'bg-green-200 dark:bg-green-900'
-    if (count === 2) return 'bg-green-400 dark:bg-green-700'
-    return 'bg-green-600 dark:bg-green-500'
+    if (count === 1) return 'bg-chart-3/40'
+    if (count === 2) return 'bg-chart-3/70'
+    return 'bg-chart-3'
   }
 
   return (
@@ -58,7 +60,7 @@ export function ActivityHeatmap({ activities, weeks = 12 }: ActivityHeatmapProps
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: index * 0.001 }}
-                className={`w-3 h-3 rounded-sm cursor-default ${getColor(day.count)}`}
+                className={`h-4 w-4 cursor-default border-[3px] border-ink ${getColor(day.count)}`}
               />
             </TooltipTrigger>
             <TooltipContent>

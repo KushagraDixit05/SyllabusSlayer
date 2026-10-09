@@ -3,6 +3,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { CommandMenu } from '@/components/dashboard/CommandMenu'
 import { GlobalAchievementNotifier } from '@/components/achievements/GlobalAchievementNotifier'
+import { GlobalMilestoneNotifier } from '@/components/celebrations/GlobalMilestoneNotifier'
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 import { auth } from '@/lib/auth'
 import { userRepository } from '@/lib/repositories/userRepository'
@@ -20,18 +21,24 @@ export default async function DashboardLayout({
   return (
     <ProtectedRoute>
       <div className="flex h-screen bg-background overflow-hidden">
-        <DashboardSidebar />
+        {/* Desktop only: the header carries its own mobile menu, so the sidebar's
+            hamburger bar would be a second, duplicate drawer below `md`. */}
+        <div className="hidden h-full md:flex">
+          <DashboardSidebar />
+        </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader
             currentStreak={userProfile?.current_streak ?? 0}
             hoursSaved={userProfile?.total_hours_completed ?? 0}
+            xp={userProfile?.xp ?? 0}
           />
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="brutal-dots flex-1 overflow-y-auto p-6">
             {children}
           </main>
         </div>
         <CommandMenu />
         <GlobalAchievementNotifier />
+        <GlobalMilestoneNotifier />
         <OnboardingTour />
       </div>
     </ProtectedRoute>

@@ -7,6 +7,7 @@ interface CircularProgressProps {
   size?: number
   label: string
   sublabel?: string
+  gradient?: 'brand' | 'flame'
 }
 
 export function CircularProgress({
@@ -14,11 +15,12 @@ export function CircularProgress({
   size = 120,
   label,
   sublabel,
+  gradient = 'brand',
 }: CircularProgressProps) {
   return (
     <div className="flex flex-col items-center space-y-2">
       <div className="relative">
-        <ProgressRing progress={progress} size={size} />
+        <ProgressRing progress={progress} size={size} gradient={gradient} />
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-bold">{Math.round(progress)}%</span>
         </div>

@@ -4,6 +4,7 @@ import { userRepository } from '@/lib/repositories/userRepository'
 import { AchievementCard } from '@/components/achievements/AchievementCard'
 import { AchievementsClientSection } from '@/components/achievements/AchievementsClientSection'
 import { ACHIEVEMENTS, getAchievementsByCategory } from '@/lib/achievements/definitions'
+import { PageHeader } from '@/components/dashboard/PageHeader'
 
 export default async function AchievementsPage() {
   const session = await auth()
@@ -27,14 +28,11 @@ export default async function AchievementsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Achievements</h1>
-        <p className="text-muted-foreground">
-          {unlockedIds.size} of {ACHIEVEMENTS.length} unlocked •{' '}
-          <span className="font-medium text-primary">{totalPoints} points earned</span>
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Trophy Room"
+        title="Achievements"
+        description={`${unlockedIds.size} of ${ACHIEVEMENTS.length} unlocked • ${totalPoints} points earned`}
+      />
 
       {/* Achievement categories */}
       {categories.map((category) => {
@@ -44,7 +42,7 @@ export default async function AchievementsPage() {
         return (
           <section key={category}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold capitalize">{category} Achievements</h2>
+              <h2 className="font-display text-xl font-black tracking-tight">{category} Achievements</h2>
               <span className="text-sm text-muted-foreground">
                 {unlockedCount}/{categoryAchievements.length}
               </span>

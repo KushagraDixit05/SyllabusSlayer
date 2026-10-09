@@ -10,15 +10,8 @@ export default async function PlaylistsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Playlists</h1>
-          <p className="text-muted-foreground">
-            {playlists.length} playlist{playlists.length !== 1 ? 's' : ''} saved
-          </p>
-        </div>
-      </div>
-
+      {/* PlaylistsClient renders the page header; it owns the filter state that
+          the header's counts depend on. */}
       <PlaylistsClient playlists={playlists} />
     </div>
   )

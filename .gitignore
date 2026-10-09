@@ -43,3 +43,12 @@ lerna-debug.log*
 # Misc
 .turbo
 .cache
+
+# Agent skill working copy (canonical tree is .agents/skills)
+agent/
+.agents/
+.claude/
+skills-lock.json
+commit-plan.sh
+documents/INTERVIEW_PREP.md
+Triumphant Green Book Mascot.png

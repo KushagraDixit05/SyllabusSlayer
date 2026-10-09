@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PlaylistFormProps {
@@ -25,10 +25,11 @@ export function PlaylistForm({ onSubmit, onClear }: PlaylistFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="playlist-input" className="mb-2 block text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="playlist-input" className="mb-2 block text-left text-xs font-bold text-muted-foreground">
           YouTube Playlist URL or ID
         </label>
         <div className="relative">
+          <Link2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             id="playlist-input"
             type="text"
@@ -36,9 +37,9 @@ export function PlaylistForm({ onSubmit, onClear }: PlaylistFormProps) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="https://www.youtube.com/playlist?list=PLxxxxxx or PLxxxxxx"
             className={cn(
-              "w-full rounded-lg border border-gray-300 dark:border-neutral-700 px-4 py-3 pr-10",
-              "bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500",
-              "focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+              "rounded-lg w-full border-[3px] border-ink bg-background py-3 pl-10 pr-10 font-mono text-sm",
+              "text-foreground placeholder:text-muted-foreground",
+              "focus:outline-none focus-visible:bg-accent",
               "transition-all duration-200"
             )}
           />
@@ -46,14 +47,14 @@ export function PlaylistForm({ onSubmit, onClear }: PlaylistFormProps) {
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Clear input"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
-        <p className="mt-2 text-left text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-left text-sm font-medium text-muted-foreground">
           Paste a YouTube playlist URL or enter the playlist ID directly
         </p>
       </div>
@@ -62,16 +63,16 @@ export function PlaylistForm({ onSubmit, onClear }: PlaylistFormProps) {
         type="submit"
         disabled={!input.trim()}
         className={cn(
-          "w-full rounded-lg px-6 py-3 font-medium text-white",
-          "bg-gradient-to-r from-blue-600 to-purple-600",
-          "hover:from-blue-700 hover:to-purple-700",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-          "disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-neutral-600 dark:disabled:to-neutral-700 disabled:cursor-not-allowed",
+          "rounded-full w-full border-[3px] border-ink px-6 py-3 font-display font-black tracking-tight text-primary-foreground",
+          "bg-primary shadow-brutal-sm brutal-lift hover:brightness-110",
+          "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
+          "focus-visible:outline-none focus-visible:ring-0",
+          "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100",
           "transition-all duration-200",
           "flex items-center justify-center gap-2"
         )}
       >
-        <Search className="h-5 w-5" />
+        <Search className="h-4 w-4" />
         Analyze Playlist
       </button>
     </form>

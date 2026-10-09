@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { StatTile } from '@/components/ui/stat-tile'
+import { ProgressRing } from '@/components/animations/ProgressRing'
 import { toast } from 'sonner'
 import {
     ArrowLeft,
@@ -18,6 +20,7 @@ import {
     ExternalLink,
     Play,
     BookOpen,
+    BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -38,17 +41,17 @@ function formatDuration(seconds: number): string {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     planning: {
         label: 'Planning',
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        color: 'bg-primary/15 text-foreground',
         icon: <BookOpen className="h-3 w-3" />,
     },
     in_progress: {
         label: 'In Progress',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+        color: 'bg-flame-from/15 text-foreground',
         icon: <Play className="h-3 w-3" />,
     },
     completed: {
         label: 'Completed',
-        color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        color: 'bg-chart-5/15 text-chart-5',
         icon: <CheckCircle2 className="h-3 w-3" />,
     },
 }
@@ -72,6 +75,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
     const completedCount = videos.filter((v) => v.is_completed).length
     const totalCount = videos.length
     const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
+    const remaining = totalCount - completedCount
 
     const totalDurationCompleted = videos
         .filter((v) => v.is_completed)
@@ -84,7 +88,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
         const newState = !currentState
 
         try {
-            await toggleVideoCompletion(videoId, playlist.id, newState)
+            await toggleVideoCompletion(videoId, playlist.id, newState, playlist.user_id)
             toast.success(newState ? 'Video marked as completed ✓' : 'Video marked as incomplete')
         } catch {
             toast.error('Failed to update video status')
@@ -110,10 +114,10 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                 </Link>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="text-2xl font-bold tracking-tight truncate">{playlist.title}</h1>
+                        <h1 className="truncate font-display text-3xl font-black tracking-tight md:text-4xl">{playlist.title}</h1>
                         <span
                             className={cn(
-                                'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                                'flex shrink-0 items-center gap-1 border-[3px] border-ink px-2 py-0.5 text-xs font-bold',
                                 status.color
                             )}
                         >
@@ -130,7 +134,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                             <Clock className="h-3.5 w-3.5" />
                             {formatDuration(playlist.total_duration)}
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1 text-chart-5">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             {completedCount}/{totalCount} completed
                         </span>
@@ -139,7 +143,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                                 href={`https://www.youtube.com/playlist?list=${playlist.youtube_playlist_id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-primary hover:underline"
+                                className="flex items-center gap-1 text-foreground hover:underline"
                             >
                                 <ExternalLink className="h-3.5 w-3.5" />
                                 YouTube
@@ -149,17 +153,42 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                 </div>
             </div>
 
-            {/* Progress Card */}
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Overall Progress</span>
-                        <span className="text-sm text-muted-foreground">
-                            {percentage}% • {formatDuration(totalDurationCompleted)} of{' '}
-                            {formatDuration(playlist.total_duration)} watched
-                        </span>
+            {/* Stat tiles */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatTile label="Videos" value={totalCount} icon={ListVideo} tone="brand" />
+                <StatTile
+                    label="Duration"
+                    value={Math.round(playlist.total_duration / 60)}
+                    suffix="m"
+                    icon={Clock}
+                    tone="rare"
+                />
+                <StatTile label="Completed" value={completedCount} icon={CheckCircle2} tone="success" />
+                <StatTile label="Progress" value={percentage} suffix="%" icon={BarChart3} tone="brand" />
+            </div>
+
+            {/* Overall Progress hero */}
+            <Card variant="elevated" className="overflow-hidden">
+                <CardContent className="flex flex-col items-center gap-6 p-6 sm:flex-row">
+                    <div className="relative flex shrink-0 items-center justify-center">
+                        <ProgressRing progress={percentage} gradient="brand" size={110} strokeWidth={9} />
+                        <span className="absolute text-2xl font-bold">{percentage}%</span>
                     </div>
-                    <Progress value={percentage} className="h-3" />
+                    <div className="flex-1 space-y-2 text-center sm:text-left">
+                        <p className="font-semibold">Overall Progress</p>
+                        <p className="text-sm text-muted-foreground">
+                            {percentage}% • {completedCount} of {totalCount} watched
+                        </p>
+                        <Progress value={percentage} />
+                        <p className="text-xs text-muted-foreground">
+                            {formatDuration(totalDurationCompleted)} of {formatDuration(playlist.total_duration)} watched
+                        </p>
+                    </div>
+                    {remaining > 0 && (
+                        <span className="rounded-full shrink-0 border-[3px] border-ink bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                            {remaining} video{remaining === 1 ? '' : 's'} remaining
+                        </span>
+                    )}
                 </CardContent>
             </Card>
 
@@ -214,7 +243,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                                                 href={`https://www.youtube.com/watch?v=${video.youtube_video_id}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-xs text-primary hover:underline"
+                                                className="text-xs text-foreground hover:underline"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 Watch on YouTube ↗
@@ -227,7 +256,7 @@ export function PlaylistDetailClient({ playlist, videos: initialVideos }: Playli
                                     </span>
 
                                     {video.is_completed && (
-                                        <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                                        <CheckCircle2 className="h-4 w-4 text-chart-5 shrink-0" />
                                     )}
                                 </div>
                             )

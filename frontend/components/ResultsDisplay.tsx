@@ -23,9 +23,11 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {/* Playlist Info */}
-      <div className="border-b border-gray-200 dark:border-neutral-700 pb-6">
-        <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{data.title}</h3>
-        
+      <div className="border-b-[3px] border-ink pb-6">
+        <h3 className="mb-4 font-display text-2xl font-black leading-none tracking-tight">
+          {data.title}
+        </h3>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
             icon={<Video className="h-5 w-5" />}
@@ -47,7 +49,7 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
 
       {/* Speed Options */}
       <div>
-        <h4 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        <h4 className="mb-4 font-display text-lg font-black tracking-tight">
           Playback Speed Options
         </h4>
         <div className="space-y-2">
@@ -66,13 +68,21 @@ export function ResultsDisplay({ data }: ResultsDisplayProps) {
   );
 }
 
+/**
+ * Not `StatTile`: that one counts up to a numeric `value`, and these are
+ * pre-formatted duration strings ("1h 23m") that can't be animated that way.
+ */
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-gray-50 dark:bg-neutral-800 p-4">
-      <div className="text-blue-600 dark:text-blue-400">{icon}</div>
-      <div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
-        <p className="text-lg font-semibold text-gray-900 dark:text-white">{value}</p>
+    <div className="rounded-lg flex items-center gap-3 border-[3px] border-ink bg-card p-4 shadow-brutal-sm">
+      <div className="rounded-full flex h-10 w-10 shrink-0 items-center justify-center border-[3px] border-ink bg-primary text-primary-foreground">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-bold text-muted-foreground">
+          {label}
+        </p>
+        <p className="font-display text-lg font-black tabular-nums">{value}</p>
       </div>
     </div>
   );
@@ -95,35 +105,30 @@ function SpeedRow({
   return (
     <div
       className={cn(
-        "flex items-center justify-between rounded-lg border p-4 transition-all",
-        isNormalSpeed ? "border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800" : "border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30"
+        "rounded-lg flex items-center justify-between border-[3px] border-ink p-4 transition-all",
+        isNormalSpeed ? "bg-card" : "bg-accent"
       )}
     >
       <div className="flex items-center gap-3">
         <span
           className={cn(
-            "rounded-md px-3 py-1 text-sm font-semibold",
-            isNormalSpeed
-              ? "bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-300"
-              : "bg-blue-600 text-white"
+            "rounded-full border-[3px] border-ink px-3 py-1 font-mono text-sm font-bold",
+            isNormalSpeed ? "bg-muted text-muted-foreground" : "bg-brand-to text-primary-foreground"
           )}
         >
           {speedLabel}
         </span>
-        <span className="text-lg font-medium text-gray-900 dark:text-gray-100">{duration}</span>
+        <span className="font-display text-lg font-black tabular-nums">{duration}</span>
       </div>
       <button
         onClick={onCopy}
-        className={cn(
-          "rounded-md p-2 transition-all",
-          "hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-        )}
+        className="p-2 transition-all hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         aria-label={`Copy ${speedLabel} duration`}
       >
         {isCopied ? (
-          <Check className="h-5 w-5 text-green-600" />
+          <Check className="h-5 w-5 text-chart-3" />
         ) : (
-          <Copy className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <Copy className="h-5 w-5 text-muted-foreground" />
         )}
       </button>
     </div>

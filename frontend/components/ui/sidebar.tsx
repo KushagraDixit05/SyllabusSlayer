@@ -1,19 +1,28 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
+import React, { useState, useRef, useEffect, createContext, useContext } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import Link from "next/link";
+
+/** Collapsed rail width and expanded panel width, in px. */
+export const SIDEBAR_RAIL_WIDTH = 80;
+export const SIDEBAR_PANEL_WIDTH = 320;
 
 interface Links {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
+  active?: boolean;
 }
 
 interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  animate: boolean;
+  /** True when labels should be readable: hovered open, or pinned wide. */
+  expanded: boolean;
+  /** True when the sidebar never animates and stays at full width. */
+  pinned: boolean;
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
@@ -40,12 +49,16 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
+  // Pinned means "always wide and always labelled" — no hover affordance at all.
+  const pinned = !animate || !!reduceMotion;
+
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+    <SidebarContext.Provider value={{ open, setOpen, expanded: open || pinned, pinned }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -83,24 +96,60 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen, pinned } = useSidebar();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
+  }, []);
+
+  const cancelClose = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  // Open immediately, but wait a beat before closing so brushing past the rail
+  // does not restart the width animation mid-flight.
+  const handleOpen = () => {
+    cancelClose();
+    if (!pinned) setOpen(true);
+  };
+
+  const handleClose = () => {
+    if (pinned) return;
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  // The spacer is the only thing the layout's flex row measures, so the main
+  // column never reflows while the panel slides out over it.
   return (
-    <>
+    <aside
+      className="relative hidden h-full shrink-0 md:block"
+      style={{ width: pinned ? SIDEBAR_PANEL_WIDTH : SIDEBAR_RAIL_WIDTH }}
+    >
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0",
+          "absolute inset-y-0 left-0 z-40 flex flex-col overflow-hidden border-r-[3px] border-ink bg-card px-3 py-4 text-foreground",
           className
         )}
+        initial={false}
         animate={{
-          width: animate ? (open ? "300px" : "72px") : "300px",
+          width: pinned || open ? SIDEBAR_PANEL_WIDTH : SIDEBAR_RAIL_WIDTH,
         }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        transition={pinned ? { duration: 0 } : { duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+        onFocusCapture={handleOpen}
         {...props}
       >
         {children}
       </motion.div>
-    </>
+    </aside>
   );
 };
 
@@ -110,47 +159,54 @@ export const MobileSidebar = ({
   ...props
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
+  const reduceMotion = useReducedMotion();
+
   return (
-    <>
-      <div
-        className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
-        )}
-        {...props}
-      >
-        <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
-              </div>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div
+      className={cn(
+        "flex h-12 w-full flex-row items-center justify-between border-b-[3px] border-ink bg-card px-4 py-2 text-foreground md:hidden"
+      )}
+      {...props}
+    >
+      <div className="z-20 flex w-full justify-end">
+        <button
+          type="button"
+          aria-label="Open navigation"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          <Menu className="h-6 w-6" />
+        </button>
       </div>
-    </>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.3, ease: "easeInOut" }
+            }
+            className={cn(
+              "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-card p-10 text-foreground",
+              className
+            )}
+          >
+            <button
+              type="button"
+              aria-label="Close navigation"
+              className="absolute right-10 top-10 z-50"
+              onClick={() => setOpen(!open)}
+            >
+              <X className="h-6 w-6" />
+            </button>
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -162,28 +218,35 @@ export const SidebarLink = ({
   link: Links;
   className?: string;
 }) => {
-  const { open, animate } = useSidebar();
+  const { expanded } = useSidebar();
+
   return (
-    <a
+    <Link
       href={link.href}
+      aria-current={link.active ? "page" : undefined}
       className={cn(
-        "flex items-center gap-2 group/sidebar py-2",
-        animate ? (open ? "justify-start" : "justify-center") : "justify-start",
+        "group/sidebar relative flex min-w-0 items-center gap-2 overflow-hidden rounded-full border-[3px] px-3 py-2 transition-colors",
+        link.active
+          ? "border-ink bg-primary text-primary-foreground shadow-brutal-sm"
+          : "border-transparent hover:bg-accent",
+        expanded ? "justify-start" : "justify-center",
         className
       )}
       {...props}
     >
       {link.icon}
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      {/* Kept in the DOM at opacity 0 so collapsed links still have an
+          accessible name; the parent's width squeezes it to nothing. */}
+      <span
+        className={cn(
+          "min-w-0 flex-1 truncate text-xs font-bold transition-opacity duration-150",
+          expanded ? "opacity-100" : "opacity-0",
+          link.active ? "text-primary-foreground" : "text-muted-foreground"
+        )}
       >
         {link.label}
-      </motion.span>
-    </a>
+      </span>
+    </Link>
   );
 };

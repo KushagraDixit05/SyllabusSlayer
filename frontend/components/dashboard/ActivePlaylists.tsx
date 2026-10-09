@@ -15,7 +15,7 @@ interface ActivePlaylistsProps {
 
 export function ActivePlaylists({ playlists }: ActivePlaylistsProps) {
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -31,7 +31,7 @@ export function ActivePlaylists({ playlists }: ActivePlaylistsProps) {
         {playlists.length === 0 ? (
           <div className="text-center py-8">
             <PlaySquare className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
-            <h3 className="mt-2 text-sm font-semibold">No active playlists</h3>
+            <h3 className="mt-2 font-display text-sm font-black">No active playlists</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Get started by creating a new playlist
             </p>
@@ -42,16 +42,16 @@ export function ActivePlaylists({ playlists }: ActivePlaylistsProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="divide-y-[3px] divide-ink border-t-[3px] border-ink">
             {playlists.slice(0, 3).map((playlist) => (
               <div
                 key={playlist.id}
-                className="p-4 border rounded-lg hover:bg-accent transition-colors"
+                className="py-4 transition-colors hover:bg-accent"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <h4 className="font-semibold line-clamp-1">{playlist.title}</h4>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                    <h4 className="line-clamp-1 font-display text-base font-black">{playlist.title}</h4>
+                    <div className="mt-1 flex items-center gap-2 text-sm font-medium text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       <span>{formatDuration(playlist.total_duration)}</span>
                       <span>•</span>
@@ -64,18 +64,18 @@ export function ActivePlaylists({ playlists }: ActivePlaylistsProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between text-xs font-bold text-muted-foreground">
                     <span>Progress</span>
-                    <span>{playlist.completion_percentage}%</span>
+                    <span className="tabular-nums">{playlist.completion_percentage}%</span>
                   </div>
-                  <Progress value={playlist.completion_percentage} className="h-2" />
+                  <Progress value={playlist.completion_percentage} />
                 </div>
 
                 <div className="flex gap-2 mt-3">
                   <Link href={`/dashboard/playlists/${playlist.id}`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button size="sm" className="w-full">
                       <BarChart3 className="h-3 w-3 mr-1" />
-                      View Details
+                      Resume Slaying
                     </Button>
                   </Link>
                 </div>

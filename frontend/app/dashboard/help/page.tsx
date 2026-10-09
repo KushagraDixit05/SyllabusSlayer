@@ -1,12 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { BookOpen, MessageCircle, PlayCircle } from 'lucide-react'
-import { FaMinus, FaPlus } from 'react-icons/fa'
 
 const faqs = [
   {
@@ -60,37 +64,31 @@ const faqs = [
 ]
 
 export default function HelpPage() {
-  const [activeId, setActiveId] = useState<number | null>(1)
-
-  const toggleAccordion = (id: number) => {
-    setActiveId(activeId === id ? null : id)
-  }
-
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold">Help &amp; FAQ</h1>
+        <h1 className="font-display text-4xl font-black tracking-tight md:text-5xl">Help &amp; FAQ</h1>
         <p className="text-muted-foreground mt-1">Everything you need to know about Syllabus Slayer</p>
       </div>
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4 flex items-center space-x-3 cursor-pointer hover:border-primary/50 transition-colors">
-          <BookOpen className="h-6 w-6 text-primary shrink-0" />
+        <Card className="flex cursor-pointer items-center space-x-3 p-4 brutal-lift">
+          <BookOpen className="h-6 w-6 text-foreground shrink-0" />
           <div>
             <p className="font-medium text-sm">Documentation</p>
             <p className="text-xs text-muted-foreground">Full guides &amp; references</p>
           </div>
         </Card>
-        <Card className="p-4 flex items-center space-x-3 cursor-pointer hover:border-primary/50 transition-colors">
-          <PlayCircle className="h-6 w-6 text-primary shrink-0" />
+        <Card className="flex cursor-pointer items-center space-x-3 p-4 brutal-lift">
+          <PlayCircle className="h-6 w-6 text-foreground shrink-0" />
           <div>
             <p className="font-medium text-sm">Video Tutorials</p>
             <p className="text-xs text-muted-foreground">Watch and learn</p>
           </div>
         </Card>
-        <Card className="p-4 flex items-center space-x-3 cursor-pointer hover:border-primary/50 transition-colors">
-          <MessageCircle className="h-6 w-6 text-primary shrink-0" />
+        <Card className="flex cursor-pointer items-center space-x-3 p-4 brutal-lift">
+          <MessageCircle className="h-6 w-6 text-foreground shrink-0" />
           <div>
             <p className="font-medium text-sm">Contact Support</p>
             <p className="text-xs text-muted-foreground">Get personalized help</p>
@@ -100,48 +98,38 @@ export default function HelpPage() {
 
       {/* FAQ */}
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight mb-1">Frequently Asked Questions</h2>
+        <h2 className="mb-1 font-display text-2xl font-black tracking-tight">Frequently Asked Questions</h2>
         <p className="text-muted-foreground text-sm mb-6">Ask everything you need to know about our products and services.</p>
 
-        <div className="overflow-hidden border border-border divide-y divide-border rounded-xl">
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="1"
+          className="rounded-lg divide-y-[3px] divide-ink border-[3px] border-ink"
+        >
           {faqs.map((faq) => (
-            <div key={faq.id} role="region">
-              <h3>
-                <button
-                  onClick={() => toggleAccordion(faq.id)}
-                  aria-expanded={activeId === faq.id}
-                  className="flex items-center justify-between w-full px-6 py-5 text-base font-semibold text-left hover:bg-muted/50 transition-colors"
-                >
-                  <span>{faq.question}</span>
-                  <span className="ml-4 shrink-0">
-                    {activeId === faq.id ? (
-                      <FaMinus className="w-4 h-4 text-foreground" />
-                    ) : (
-                      <FaPlus className="w-4 h-4 text-foreground" />
-                    )}
-                  </span>
-                </button>
-              </h3>
-              {activeId === faq.id && (
-                <div className="px-6 pb-6">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
-                </div>
-              )}
-            </div>
+            <AccordionItem key={faq.id} value={String(faq.id)} className="border-0">
+              <AccordionTrigger className="px-6 py-5 text-left font-display text-base font-black hover:bg-accent">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-sm leading-relaxed text-muted-foreground">{faq.answer}</p>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
 
         {/* Still have questions CTA */}
-        <div className="mt-8 overflow-hidden text-center bg-muted/50 rounded-xl">
+        <div className="rounded-lg mt-8 overflow-hidden border-[3px] border-ink bg-muted text-center shadow-brutal">
           <div className="px-6 py-12 sm:p-12">
             <div className="max-w-sm mx-auto">
-              <h3 className="text-2xl font-semibold">Still have questions?</h3>
+              <h3 className="font-display text-xl font-black tracking-tight">Still have questions?</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 Can&apos;t find the answer you&apos;re looking for? Chat with our friendly support team.
               </p>
               <div className="mt-6 flex items-center justify-center gap-3">
-                <Button className="rounded-full px-6">Contact Support</Button>
-                <Button variant="outline" className="rounded-full px-6">Join Community</Button>
+                <Button>Contact Support</Button>
+                <Button variant="outline">Join Community</Button>
               </div>
             </div>
           </div>
